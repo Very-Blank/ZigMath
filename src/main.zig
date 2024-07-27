@@ -1,4 +1,4 @@
-const vec3 = @import("vector3.zig");
-const mat4 = @import("mat4.zig");
-const quat = @import("quaternion.zig");
-const constants = @import("constants.zig");
+pub const vec3 = @import("vector3.zig");
+pub const mat4 = @import("mat4.zig");
+pub const quat = @import("quaternion.zig");
+pub const constants = @import("constants.zig");
