@@ -98,7 +98,9 @@ pub fn multiply(mat1: Mat4, mat2: Mat4) Mat4 {
         }
     }
 
-    return result;
+    return .{
+        .fields = result,
+    };
 }
 
 pub fn createPerspective(fov: f32, aspect: f32, near: f32, far: f32) Mat4 {
