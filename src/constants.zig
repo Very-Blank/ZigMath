@@ -1,4 +1,4 @@
-const Axis = enum {
+pub const Axis = enum {
     y,
     x,
     z,
