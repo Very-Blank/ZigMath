@@ -56,18 +56,18 @@ pub const Mat4 = struct {
 
     pub fn setRotation(self: *Mat4, rotation: quat.Quaternion) void {
         self.fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ 1 - 2 * (rotation[1] * rotation[1] + rotation[2] * rotation[2]), 2 * rotation[0] * rotation[1] + 2 * rotation[2] * rotation[3], 2 * rotation[0] * rotation[2] - 2 * rotation[1] * rotation[3], 0.0 },
-            @Vector(4, f32){ 2 * rotation[0] * rotation[1] - 2 * rotation[2] * rotation[3], 1 - 2 * (rotation[0] * rotation[0] + rotation[2] * rotation[2]), 2 * rotation[1] * rotation[2] + 2 * rotation[0] * rotation[3], 0.0 },
-            @Vector(4, f32){ 2 * rotation[0] * rotation[2] + 2 * rotation[1] * rotation[3], 2 * rotation[1] * rotation[2] - 2 * rotation[0] * rotation[3], 1 - 2 * (rotation[0] * rotation[0] + rotation[1] * rotation[1]), 0.0 },
+            @Vector(4, f32){ 1 - 2 * (rotation.data[1] * rotation.data[1] + rotation.data[2] * rotation.data[2]), 2 * rotation.data[0] * rotation.data[1] + 2 * rotation.data[2] * rotation.data[3], 2 * rotation.data[0] * rotation.data[2] - 2 * rotation.data[1] * rotation.data[3], 0.0 },
+            @Vector(4, f32){ 2 * rotation.data[0] * rotation.data[1] - 2 * rotation.data[2] * rotation.data[3], 1 - 2 * (rotation.data[0] * rotation.data[0] + rotation.data[2] * rotation.data[2]), 2 * rotation.data[1] * rotation.data[2] + 2 * rotation.data[0] * rotation.data[3], 0.0 },
+            @Vector(4, f32){ 2 * rotation.data[0] * rotation.data[2] + 2 * rotation.data[1] * rotation.data[3], 2 * rotation.data[1] * rotation.data[2] - 2 * rotation.data[0] * rotation.data[3], 1 - 2 * (rotation.data[0] * rotation.data[0] + rotation.data[1] * rotation.data[1]), 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         };
     }
 
     pub fn setScale(self: *Mat4, scale: vec3.Vector3) void {
         self.fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ scale[0], 0.0, 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, scale[1], 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 0.0, scale[2], 0.0 },
+            @Vector(4, f32){ scale.data[0], 0.0, 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, scale.data[1], 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, 0.0, scale.data[2], 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         };
     }
@@ -77,7 +77,7 @@ pub const Mat4 = struct {
             @Vector(4, f32){ 1.0, 0.0, 0.0, 0.0 },
             @Vector(4, f32){ 0.0, 1.0, 0.0, 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 1.0, 0.0 },
-            @Vector(4, f32){ vector[0], vector[1], vector[2], 1.0 },
+            @Vector(4, f32){ vector.data[0], vector.data[1], vector.data[2], 1.0 },
         };
     }
 };
@@ -116,9 +116,9 @@ pub fn createPerspective(fov: f32, aspect: f32, near: f32, far: f32) Mat4 {
 pub fn createRotation(rotation: quat.Quaternion) Mat4 {
     return .{
         .fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ 1 - 2 * (rotation[1] * rotation[1] + rotation[2] * rotation[2]), 2 * rotation[0] * rotation[1] + 2 * rotation[2] * rotation[3], 2 * rotation[0] * rotation[2] - 2 * rotation[1] * rotation[3], 0.0 },
-            @Vector(4, f32){ 2 * rotation[0] * rotation[1] - 2 * rotation[2] * rotation[3], 1 - 2 * (rotation[0] * rotation[0] + rotation[2] * rotation[2]), 2 * rotation[1] * rotation[2] + 2 * rotation[0] * rotation[3], 0.0 },
-            @Vector(4, f32){ 2 * rotation[0] * rotation[2] + 2 * rotation[1] * rotation[3], 2 * rotation[1] * rotation[2] - 2 * rotation[0] * rotation[3], 1 - 2 * (rotation[0] * rotation[0] + rotation[1] * rotation[1]), 0.0 },
+            @Vector(4, f32){ 1 - 2 * (rotation.data[1] * rotation.data[1] + rotation.data[2] * rotation.data[2]), 2 * rotation.data[0] * rotation.data[1] + 2 * rotation.data[2] * rotation.data[3], 2 * rotation.data[0] * rotation.data[2] - 2 * rotation.data[1] * rotation.data[3], 0.0 },
+            @Vector(4, f32){ 2 * rotation.data[0] * rotation.data[1] - 2 * rotation.data[2] * rotation.data[3], 1 - 2 * (rotation.data[0] * rotation.data[0] + rotation.data[2] * rotation.data[2]), 2 * rotation.data[1] * rotation.data[2] + 2 * rotation.data[0] * rotation.data[3], 0.0 },
+            @Vector(4, f32){ 2 * rotation.data[0] * rotation.data[2] + 2 * rotation.data[1] * rotation.data[3], 2 * rotation.data[1] * rotation.data[2] - 2 * rotation.data[0] * rotation.data[3], 1 - 2 * (rotation.data[0] * rotation.data[0] + rotation.data[1] * rotation.data[1]), 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         },
     };
@@ -127,9 +127,9 @@ pub fn createRotation(rotation: quat.Quaternion) Mat4 {
 pub fn createScale(scale: vec3.Vector3) Mat4 {
     return .{
         .fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ scale[0], 0.0, 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, scale[1], 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 0.0, scale[2], 0.0 },
+            @Vector(4, f32){ scale.data[0], 0.0, 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, scale.data[1], 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, 0.0, scale.data[2], 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         },
     };
@@ -141,7 +141,7 @@ pub fn createTranslate(vector: vec3.Vector3) Mat4 {
             @Vector(4, f32){ 1.0, 0.0, 0.0, 0.0 },
             @Vector(4, f32){ 0.0, 1.0, 0.0, 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 1.0, 0.0 },
-            @Vector(4, f32){ vector[0], vector[1], vector[2], 1.0 },
+            @Vector(4, f32){ vector.data[0], vector.data[1], vector.data[2], 1.0 },
         },
     };
 }
