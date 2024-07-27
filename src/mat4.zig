@@ -155,5 +155,5 @@ pub inline fn createView(position: vec3.Vector3, rotation: quat.Quaternion) Mat4
 }
 
 pub inline fn createModel(position: vec3.Vector3, scale: vec3.Vector3, rotation: quat.Quaternion) Mat4 {
-    return multiply(multiply(createTranslate(position), createScale(scale), createRotation(rotation)));
+    return multiply(multiply(createTranslate(position), createScale(scale)), createRotation(rotation));
 }
