@@ -54,11 +54,16 @@ pub const Mat4 = struct {
         };
     }
 
-    pub fn setRotation(self: *Mat4, rotation: quat.Quaternion) void {
+    pub fn setRotation(self: *Mat4, rot: quat.Quaternion) void {
+        // 2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0])
+        //
+        // 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0])
+        //
+        // 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0])
         self.fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ 1 - 2 * (rotation.data[1] * rotation.data[1] + rotation.data[2] * rotation.data[2]), 2 * rotation.data[0] * rotation.data[1] + 2 * rotation.data[2] * rotation.data[3], 2 * rotation.data[0] * rotation.data[2] - 2 * rotation.data[1] * rotation.data[3], 0.0 },
-            @Vector(4, f32){ 2 * rotation.data[0] * rotation.data[1] - 2 * rotation.data[2] * rotation.data[3], 1 - 2 * (rotation.data[0] * rotation.data[0] + rotation.data[2] * rotation.data[2]), 2 * rotation.data[1] * rotation.data[2] + 2 * rotation.data[0] * rotation.data[3], 0.0 },
-            @Vector(4, f32){ 2 * rotation.data[0] * rotation.data[2] + 2 * rotation.data[1] * rotation.data[3], 2 * rotation.data[1] * rotation.data[2] - 2 * rotation.data[0] * rotation.data[3], 1 - 2 * (rotation.data[0] * rotation.data[0] + rotation.data[1] * rotation.data[1]), 0.0 },
+            @Vector(4, f32){ 1.0 - 2 * (@exp2(rot.data[2]) + @exp2(rot.data[3])), 2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]), 2 * (rot.data[1] * rot.data[3] - rot.data[2] * rot.data[0]), 0.0 },
+            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]), 1.0 - 2 * (@exp2(rot.data[1]) + @exp2(rot.data[3])), 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]), 0.0 },
+            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]), 1.0 - 2 * (@exp2(rot.data[1]) + @exp2(rot.data[2])), 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         };
     }
@@ -115,12 +120,12 @@ pub fn createPerspective(fov: f32, aspect: f32, near: f32, far: f32) Mat4 {
     };
 }
 
-pub fn createRotation(rotation: quat.Quaternion) Mat4 {
+pub fn createRotation(rot: quat.Quaternion) Mat4 {
     return .{
         .fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ 1 - 2 * (rotation.data[1] * rotation.data[1] + rotation.data[2] * rotation.data[2]), 2 * rotation.data[0] * rotation.data[1] + 2 * rotation.data[2] * rotation.data[3], 2 * rotation.data[0] * rotation.data[2] - 2 * rotation.data[1] * rotation.data[3], 0.0 },
-            @Vector(4, f32){ 2 * rotation.data[0] * rotation.data[1] - 2 * rotation.data[2] * rotation.data[3], 1 - 2 * (rotation.data[0] * rotation.data[0] + rotation.data[2] * rotation.data[2]), 2 * rotation.data[1] * rotation.data[2] + 2 * rotation.data[0] * rotation.data[3], 0.0 },
-            @Vector(4, f32){ 2 * rotation.data[0] * rotation.data[2] + 2 * rotation.data[1] * rotation.data[3], 2 * rotation.data[1] * rotation.data[2] - 2 * rotation.data[0] * rotation.data[3], 1 - 2 * (rotation.data[0] * rotation.data[0] + rotation.data[1] * rotation.data[1]), 0.0 },
+            @Vector(4, f32){ 1.0 - 2 * (@exp2(rot.data[2]) + @exp2(rot.data[3])), 2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]), 2 * (rot.data[1] * rot.data[3] - rot.data[2] * rot.data[0]), 0.0 },
+            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]), 1.0 - 2 * (@exp2(rot.data[1]) + @exp2(rot.data[3])), 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]), 0.0 },
+            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]), 1.0 - 2 * (@exp2(rot.data[1]) + @exp2(rot.data[2])), 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         },
     };
