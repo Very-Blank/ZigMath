@@ -62,12 +62,12 @@ pub const Mat4 = struct {
         // 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0])
 
         //row major
-        self.fields = [4]@Vector(4, f32){
-            // @Vector(4, f32){ 1.0 - 2 * (@exp2(rot.data[2]) + @exp2(rot.data[3])), 2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]), 2 * (rot.data[1] * rot.data[3] - rot.data[2] * rot.data[0]), 0.0 },
-            // @Vector(4, f32){ 2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]), 1.0 - 2 * (@exp2(rot.data[1]) + @exp2(rot.data[3])), 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]), 0.0 },
-            // @Vector(4, f32){ 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]), 1.0 - 2 * (@exp2(rot.data[1]) + @exp2(rot.data[2])), 0.0 },
-            // @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
-        };
+        // self.fields = [4]@Vector(4, f32){
+        //     // @Vector(4, f32){ 1.0 - 2 * (@exp2(rot.data[2]) + @exp2(rot.data[3])), 2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]), 2 * (rot.data[1] * rot.data[3] - rot.data[2] * rot.data[0]), 0.0 },
+        //     // @Vector(4, f32){ 2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]), 1.0 - 2 * (@exp2(rot.data[1]) + @exp2(rot.data[3])), 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]), 0.0 },
+        //     // @Vector(4, f32){ 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]), 1.0 - 2 * (@exp2(rot.data[1]) + @exp2(rot.data[2])), 0.0 },
+        //     // @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
+        // };
 
         //column major
         self.fields = [4]@Vector(4, f32){
