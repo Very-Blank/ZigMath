@@ -1,7 +1,7 @@
 const std = @import("std");
 const vec3 = @import("vector3.zig");
 const quat = @import("quaternion.zig");
-const pow = @import("std.math.pow");
+const math = std.math;
 
 /// zero matrix.
 pub const ZERO = Mat4{
@@ -58,9 +58,9 @@ pub const Mat4 = struct {
     pub fn setRotation(self: *Mat4, rot: quat.Quaternion) void {
         // column major
         self.fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ 1.0 - 2 * (pow.pow(rot.data[2], 2) + pow.pow(rot.data[3], 2)), 2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]), 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 0.0 },
-            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]), 1.0 - 2 * (pow.pow(rot.data[1], 2) + pow.pow(rot.data[3], 2)), 2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]), 0.0 },
-            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]), 1.0 - 2 * (pow.pow(rot.data[1], 2) + pow.pow(rot.data[2], 2)), 0.0 },
+            @Vector(4, f32){ 1.0 - 2 * (math.pow(rot.data[2], 2) + math.pow(rot.data[3], 2)), 2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]), 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 0.0 },
+            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]), 1.0 - 2 * (math.pow(rot.data[1], 2) + math.pow(rot.data[3], 2)), 2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]), 0.0 },
+            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]), 1.0 - 2 * (math.pow(rot.data[1], 2) + math.pow(rot.data[2], 2)), 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         };
     }
@@ -120,9 +120,9 @@ pub fn createPerspective(fov: f32, aspect: f32, near: f32, far: f32) Mat4 {
 pub fn createRotation(rot: quat.Quaternion) Mat4 {
     return .{
         .fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ 1.0 - 2 * (pow.pow(rot.data[2], 2) + pow.pow(rot.data[3], 2)), 2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]), 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 0.0 },
-            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]), 1.0 - 2 * (pow.pow(rot.data[1], 2) + pow.pow(rot.data[3], 2)), 2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]), 0.0 },
-            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]), 1.0 - 2 * (pow.pow(rot.data[1], 2) + pow.pow(rot.data[2], 2)), 0.0 },
+            @Vector(4, f32){ 1.0 - 2 * (math.pow(rot.data[2], 2) + math.pow(rot.data[3], 2)), 2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]), 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 0.0 },
+            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]), 1.0 - 2 * (math.pow(rot.data[1], 2) + math.pow(rot.data[3], 2)), 2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]), 0.0 },
+            @Vector(4, f32){ 2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]), 2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]), 1.0 - 2 * (math.pow(rot.data[1], 2) + math.pow(rot.data[2], 2)), 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         },
     };
