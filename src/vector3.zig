@@ -1,10 +1,10 @@
 const std = @import("std");
 const constants = @import("constants.zig");
 
-pub const ZERO = Vector3.init(0, 0, 0);
-pub const UP = Vector3.init(0, 1, 0);
-pub const RIGHT = Vector3.init(1, 0, 0);
-pub const FORWARD = Vector3.init(0, 0, 1);
+pub const ZERO: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 0.0, 0.0 } };
+pub const UP: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 1.0, 0.0 } };
+pub const RIGHT: Vector3 = .{ .data = @Vector(3, f32){ 1.0, 0.0, 0.0 } };
+pub const FORWARD: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 0.0, 1.0 } };
 
 pub const Vector3 = struct {
     data: @Vector(3, f32),

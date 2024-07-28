@@ -2,11 +2,10 @@ const std = @import("std");
 const constants = @import("constants.zig");
 const vec3 = @import("vector3.zig");
 
+const IDENTITY: Quaternion = .{ .data = @Vector(4, f32){ 1, 0, 0, 0 } };
+
 pub const Quaternion = struct {
     data: @Vector(4, f32),
-    pub inline fn setIdentity(self: *Quaternion) void {
-        self.data = @Vector(4, f32){ 1, 0, 0, 0 };
-    }
 
     pub fn setFromAngle(radians: f32, axis: constants.Axis) void {
         switch (axis) {
@@ -43,10 +42,6 @@ pub const Quaternion = struct {
         };
     }
 };
-
-pub inline fn createIdentity() Quaternion {
-    return .{ .data = @Vector(4, f32){ 1, 0, 0, 0 } };
-}
 
 pub fn createFromRadians(radians: f32, axis: constants.Axis) Quaternion {
     switch (axis) {
