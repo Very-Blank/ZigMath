@@ -60,7 +60,8 @@ pub const Vector3 = struct {
     }
 
     pub inline fn setRotate(self: *Vector3, rot: quat.Quaternion) void {
-        self.data = self.data + ((crossData(rot.data[1..4], self.data) * rot[0]) + (crossData(rot.data[1..4], (crossData(rot.data[1..4], self.data))))) * 2.0;
+        const rot_vec = @Vector(3, f32){ rot[1], rot[2], rot[3] };
+        self.data = self.data + ((crossData(rot_vec, self.data) * rot[0]) + (crossData(rot_vec, (crossData(rot_vec, self.data))))) * 2.0;
     }
 };
 
@@ -141,7 +142,8 @@ pub inline fn crossData(vec1: @Vector(3, f32), vec2: @Vector(3, f32)) @Vector(3,
 }
 
 pub inline fn rotate(vec1: Vector3, rot: quat.Quaternion) Vector3 {
-    vec1.data = vec1.data + ((crossData(rot.data[1..4], vec1.data) * rot[0]) + (crossData(rot.data[1..4], (crossData(rot.data[1..4], vec1.data))))) * 2.0;
+    const rot_vec = @Vector(3, f32){ rot[1], rot[2], rot[3] };
+    vec1.data = vec1.data + ((crossData(rot_vec, vec1.data) * rot[0]) + (crossData(rot_vec, (crossData(rot_vec, vec1.data))))) * 2.0;
 }
 
 pub inline fn length(vec1: Vector3) f32 {
