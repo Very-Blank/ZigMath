@@ -82,6 +82,14 @@ pub const Mat4 = struct {
             @Vector(4, f32){ vector.data[0], vector.data[1], vector.data[2], 1.0 },
         };
     }
+
+    pub inline fn setView(position: vec3.Vector3, rotation: quat.Quaternion) void {
+        setMultiply(createTranslate(position), createRotation(rotation));
+    }
+
+    pub inline fn setModel(position: vec3.Vector3, scale: vec3.Vector3, rotation: quat.Quaternion) void {
+        setMultiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale));
+    }
 };
 
 pub fn multiply(mat1: Mat4, mat2: Mat4) Mat4 {
