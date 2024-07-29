@@ -2,7 +2,7 @@ const std = @import("std");
 const constants = @import("constants.zig");
 const vec3 = @import("vector3.zig");
 
-const IDENTITY: Quaternion = .{ .data = @Vector(4, f32){ 1, 0, 0, 0 } };
+pub const IDENTITY: Quaternion = .{ .data = @Vector(4, f32){ 1, 0, 0, 0 } };
 
 pub const Quaternion = struct {
     data: @Vector(4, f32),
