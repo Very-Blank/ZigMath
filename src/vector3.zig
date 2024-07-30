@@ -155,7 +155,7 @@ pub inline fn divide(vec1: Vector3, vec2: Vector3) Vector3 {
     };
 }
 
-pub inline fn scale(vec1: Vector3, float: f32) void {
+pub inline fn scale(vec1: Vector3, float: f32) Vector3 {
     return .{
         .data = @Vector(3, f32){
             vec1.data[0] * float,
@@ -165,7 +165,7 @@ pub inline fn scale(vec1: Vector3, float: f32) void {
     };
 }
 
-pub inline fn segment(vec1: Vector3, float: f32) void {
+pub inline fn segment(vec1: Vector3, float: f32) Vector3 {
     return .{
         .data = @Vector(3, f32){
             vec1.data[0] / float,
