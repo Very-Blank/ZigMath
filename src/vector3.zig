@@ -199,7 +199,7 @@ pub inline fn crossData(vec1: @Vector(3, f32), vec2: @Vector(3, f32)) @Vector(3,
 
 pub inline fn rotate(vec1: Vector3, rot: quat.Quaternion) Vector3 {
     const rot_vec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
-    vec1.data = vec1.data + ((crossData(rot_vec, vec1.data) * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + (crossData(rot_vec, (crossData(rot_vec, vec1.data))))) * @Vector(3, f32){ 2.0, 2.0, 2.0 };
+    return .{ .data = vec1.data + ((crossData(rot_vec, vec1.data) * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + (crossData(rot_vec, (crossData(rot_vec, vec1.data))))) * @Vector(3, f32){ 2.0, 2.0, 2.0 } };
 }
 
 pub inline fn length(vec1: Vector3) f32 {
