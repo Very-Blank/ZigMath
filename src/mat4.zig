@@ -84,11 +84,11 @@ pub const Mat4 = struct {
     }
 
     pub inline fn setView(self: *Mat4, position: vec3.Vector3, rotation: quat.Quaternion) void {
-        self.setMultiply(createTranslate(position), createRotation(rotation));
+        self = multiply(createTranslate(position), createRotation(rotation));
     }
 
     pub inline fn setModel(self: *Mat4, position: vec3.Vector3, scale: vec3.Vector3, rotation: quat.Quaternion) void {
-        self.setMultiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale));
+        self = multiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale));
     }
 };
 
