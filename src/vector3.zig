@@ -40,11 +40,19 @@ pub const Vector3 = struct {
     }
 
     pub inline fn setScale(self: *Vector3, other: f32) void {
-        self.data *= other;
+        self.data = @Vector(3, f32){
+            self.data[0] * other,
+            self.data[1] * other,
+            self.data[2] * other,
+        };
     }
 
     pub inline fn setSegment(self: *Vector3, other: f32) void {
-        self.data /= other;
+        self.data = @Vector(3, f32){
+            self.data[0] / other,
+            self.data[1] / other,
+            self.data[2] / other,
+        };
     }
 
     pub inline fn setNegate(self: *Vector3) void {
@@ -61,7 +69,7 @@ pub const Vector3 = struct {
 
     pub inline fn setRotate(self: *Vector3, rot: quat.Quaternion) void {
         const rot_vec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
-        self.data = self.data + ((crossData(rot_vec, self.data) * rot.data[0]) + (crossData(rot_vec, (crossData(rot_vec, self.data))))) * 2.0;
+        self.data = self.data + ((crossData(rot_vec, self.data) * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + (crossData(rot_vec, (crossData(rot_vec, self.data))))) * 2.0;
     }
 };
 
@@ -109,13 +117,21 @@ pub inline fn divide(vec1: Vector3, vec2: Vector3) Vector3 {
 
 pub inline fn scale(vec1: Vector3, float: f32) void {
     return .{
-        .data = vec1.data + float,
+        .data = @Vector(3, f32){
+            vec1.data[0] * float,
+            vec1.data[1] * float,
+            vec1.data[2] * float,
+        },
     };
 }
 
 pub inline fn segment(vec1: Vector3, float: f32) void {
     return .{
-        .data = vec1.data / float,
+        .data = @Vector(3, f32){
+            vec1.data[0] / float,
+            vec1.data[1] / float,
+            vec1.data[2] / float,
+        },
     };
 }
 
@@ -143,7 +159,7 @@ pub inline fn crossData(vec1: @Vector(3, f32), vec2: @Vector(3, f32)) @Vector(3,
 
 pub inline fn rotate(vec1: Vector3, rot: quat.Quaternion) Vector3 {
     const rot_vec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
-    vec1.data = vec1.data + ((crossData(rot_vec, vec1.data) * rot.data[0]) + (crossData(rot_vec, (crossData(rot_vec, vec1.data))))) * 2.0;
+    vec1.data = vec1.data + ((crossData(rot_vec, vec1.data) * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + (crossData(rot_vec, (crossData(rot_vec, vec1.data))))) * 2.0;
 }
 
 pub inline fn length(vec1: Vector3) f32 {
