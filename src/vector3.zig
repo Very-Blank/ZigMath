@@ -11,6 +11,22 @@ pub const FORWARD: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 0.0, 1.0 } };
 pub const Vector3 = struct {
     data: @Vector(3, f32),
 
+    pub inline fn setZERO(self: *Vector3) void {
+        self.data = @Vector(3, f32){ 0.0, 0.0, 0.0 };
+    }
+
+    pub inline fn setUP(self: *Vector3) void {
+        self.data = @Vector(3, f32){ 0.0, 1.0, 0.0 };
+    }
+
+    pub inline fn setRIGHT(self: *Vector3) void {
+        self.data = @Vector(3, f32){ 1.0, 0.0, 0.0 };
+    }
+
+    pub inline fn setFORWARD(self: *Vector3) void {
+        self.data = @Vector(3, f32){ 0.0, 0.0, 1.0 };
+    }
+
     pub inline fn floatSet(self: *Vector3, floatx: f32, floaty: f32, floatz: f32) void {
         self.data = @Vector(3, f32){ floatx, floaty, floatz };
     }
@@ -72,6 +88,30 @@ pub const Vector3 = struct {
         self.data = self.data + ((crossData(rot_vec, self.data) * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + (crossData(rot_vec, (crossData(rot_vec, self.data))))) * @Vector(3, f32){ 2.0, 2.0, 2.0 };
     }
 };
+
+pub inline fn createZERO() Vector3 {
+    return .{
+        .data = @Vector(3, f32){ 0.0, 0.0, 0.0 },
+    };
+}
+
+pub inline fn createUP() Vector3 {
+    return .{
+        .data = @Vector(3, f32){ 0.0, 1.0, 0.0 },
+    };
+}
+
+pub inline fn createRIGHT() Vector3 {
+    return .{
+        .data = @Vector(3, f32){ 1.0, 0.0, 0.0 },
+    };
+}
+
+pub inline fn createFORWARD() Vector3 {
+    return .{
+        .data = @Vector(3, f32){ 0.0, 0.0, 1.0 },
+    };
+}
 
 pub inline fn floatCreate(floatx: f32, floaty: f32, floatz: f32) Vector3 {
     return .{

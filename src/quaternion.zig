@@ -7,6 +7,10 @@ pub const IDENTITY: Quaternion = .{ .data = @Vector(4, f32){ 1, 0, 0, 0 } };
 pub const Quaternion = struct {
     data: @Vector(4, f32),
 
+    pub fn setIDENTITY(self: *Quaternion) void {
+        self.data = @Vector(4, f32){ 1, 0, 0, 0 };
+    }
+
     pub fn setFromAngle(radians: f32, axis: constants.Axis) void {
         switch (axis) {
             .x => {
@@ -42,6 +46,12 @@ pub const Quaternion = struct {
         };
     }
 };
+
+pub fn createIDENTITY() Quaternion {
+    return .{
+        .data = @Vector(4, f32){ 1, 0, 0, 0 },
+    };
+}
 
 pub fn createFromRadians(radians: f32, axis: constants.Axis) Quaternion {
     switch (axis) {
