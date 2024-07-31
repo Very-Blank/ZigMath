@@ -76,16 +76,20 @@ pub const Vector3 = struct {
     }
 
     pub inline fn setCross(self: *Vector3, other: Vector3) void {
-        self.data = @Vector(3, f32){ (self.data[1] * other.data[2] - self.data[2] * other.data[1]), (self.data[2] * other.data[0] - self.data[0] * other.data[2]), (self.data[0] * other.data[1] - self.data[1] * other.data[0]) };
-    }
-
-    pub inline fn setCrossData(self: @Vector(3, f32), vec2: @Vector(3, f32)) void {
-        self.data = @Vector(3, f32){ (self.data[1] * vec2[2] - self.data[2] * vec2.data[1]), (self.data[2] * vec2[0] - self.data[0] * vec2[2]), (self.data[0] * vec2[1] - self.data[1] * vec2[0]) };
+        self.data = @Vector(3, f32){
+            (self.data[1] * other.data[2] - self.data[2] * other.data[1]),
+            (self.data[2] * other.data[0] - self.data[0] * other.data[2]),
+            (self.data[0] * other.data[1] - self.data[1] * other.data[0]),
+        };
     }
 
     pub inline fn setRotate(self: *Vector3, rot: quat.Quaternion) void {
         const rot_vec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
         self.data = self.data + ((crossData(rot_vec, self.data) * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + (crossData(rot_vec, (crossData(rot_vec, self.data))))) * @Vector(3, f32){ 2.0, 2.0, 2.0 };
+    }
+
+    pub inline fn setNormalize(self: *Vector3) void {
+        self.data /= @splat(length(self));
     }
 };
 
@@ -190,11 +194,21 @@ pub inline fn dotData(vec1: @Vector(3, f32), vec2: @Vector(3, f32)) f32 {
 }
 
 pub inline fn cross(vec1: Vector3, vec2: Vector3) Vector3 {
-    return .{ .data = @Vector(3, f32){ (vec1.data[1] * vec2.data[2] - vec1.data[2] * vec2.data[1]), (vec1.data[2] * vec2.data[0] - vec1.data[0] * vec2.data[2]), (vec1.data[0] * vec2.data[1] - vec1.data[1] * vec2.data[0]) } };
+    return .{
+        .data = @Vector(3, f32){
+            (vec1.data[1] * vec2.data[2] - vec1.data[2] * vec2.data[1]),
+            (vec1.data[2] * vec2.data[0] - vec1.data[0] * vec2.data[2]),
+            (vec1.data[0] * vec2.data[1] - vec1.data[1] * vec2.data[0]),
+        },
+    };
 }
 
 pub inline fn crossData(vec1: @Vector(3, f32), vec2: @Vector(3, f32)) @Vector(3, f32) {
-    return @Vector(3, f32){ (vec1[1] * vec2[2] - vec1[2] * vec2[1]), (vec1[2] * vec2[0] - vec1[0] * vec2[2]), (vec1[0] * vec2[1] - vec1[1] * vec2[0]) };
+    return @Vector(3, f32){
+        (vec1[1] * vec2[2] - vec1[2] * vec2[1]),
+        (vec1[2] * vec2[0] - vec1[0] * vec2[2]),
+        (vec1[0] * vec2[1] - vec1[1] * vec2[0]),
+    };
 }
 
 pub inline fn rotate(vec1: Vector3, rot: quat.Quaternion) Vector3 {
@@ -208,4 +222,10 @@ pub inline fn length(vec1: Vector3) f32 {
 
 pub inline fn distance(vec1: Vector3, vec2: Vector3) f32 {
     return @sqrt(math.pow(f32, vec2.data[0] - vec1.data[0], 2.0) + math.pow(f32, vec2.data[1] - vec1.data[1], 2.0) + math.pow(f32, vec2.data[2] - vec1.data[2], 2.0));
+}
+
+pub inline fn normalize(vec1: Vector3) Vector3 {
+    return .{
+        .data = vec1.data / @Vector(3, f32){@splat(length(vec1))},
+    };
 }
