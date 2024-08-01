@@ -90,7 +90,9 @@ pub const Vector3 = struct {
 
     pub inline fn setNormalize(self: *Vector3) void {
         const len: f32 = getLength(self);
-        self.data = self.data / @Vector(3, f32){ len, len, len };
+        if (len > 0) {
+            self.data = self.data / @Vector(3, f32){ len, len, len };
+        }
     }
 
     pub inline fn getLength(self: *Vector3) f32 {
