@@ -3,3 +3,5 @@ pub const Axis = enum {
     x,
     z,
 };
+
+pub const PI: f32 = 3.141592;
