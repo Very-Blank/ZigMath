@@ -84,8 +84,10 @@ pub const Vector3 = struct {
     }
 
     pub inline fn setRotate(self: *Vector3, rot: quat.Quaternion) void {
-        const rot_vec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
-        self.data = self.data + ((crossData(rot_vec, self.data) * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + (crossData(rot_vec, (crossData(rot_vec, self.data))))) * @Vector(3, f32){ 2.0, 2.0, 2.0 };
+        const qVec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
+        const uv = crossData(qVec, self.data);
+        const uuv = crossData(qVec, uv);
+        self.data = self.data + ((uv * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + uuv) * @Vector(3, f32){ 2.0, 2.0, 2.0 };
     }
 
     pub inline fn setNormalize(self: *Vector3) void {
@@ -227,8 +229,10 @@ pub inline fn crossData(vec1: @Vector(3, f32), vec2: @Vector(3, f32)) @Vector(3,
 }
 
 pub inline fn rotate(vec1: Vector3, rot: quat.Quaternion) Vector3 {
-    const rot_vec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
-    return .{ .data = vec1.data + ((crossData(rot_vec, vec1.data) * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + (crossData(rot_vec, (crossData(rot_vec, vec1.data))))) * @Vector(3, f32){ 2.0, 2.0, 2.0 } };
+    const qVec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
+    const uv = crossData(qVec, vec1.data);
+    const uuv = crossData(qVec, uv);
+    vec1.data = vec1.data + ((uv * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + uuv) * @Vector(3, f32){ 2.0, 2.0, 2.0 };
 }
 
 pub inline fn length(vec1: Vector3) f32 {
