@@ -89,7 +89,20 @@ pub const Vector3 = struct {
     }
 
     pub inline fn setNormalize(self: *Vector3) void {
-        self.data /= @splat(length(self));
+        const len: f32 = getLength(self);
+        self.data = self.data / @Vector(3, f32){ len, len, len };
+    }
+
+    pub inline fn getLength(self: *Vector3) f32 {
+        return @sqrt(math.pow(f32, self.data[0], 2.0) + math.pow(f32, self.data[1], 2.0) + math.pow(f32, self.data[2], 2.0));
+    }
+
+    pub inline fn getDot(self: *Vector3, vec2: Vector3) f32 {
+        return self.data[0] * vec2.data[0] + self.data[1] * vec2.data[1] + self.data[2] * vec2.data[2];
+    }
+
+    pub inline fn getDistance(self: *Vector3, vec2: Vector3) f32 {
+        return @sqrt(math.pow(f32, vec2.data[0] - self.data[0], 2.0) + math.pow(f32, vec2.data[1] - self.data[1], 2.0) + math.pow(f32, vec2.data[2] - self.data[2], 2.0));
     }
 };
 
@@ -225,7 +238,8 @@ pub inline fn distance(vec1: Vector3, vec2: Vector3) f32 {
 }
 
 pub inline fn normalize(vec1: Vector3) Vector3 {
+    const len: f32 = length(vec1);
     return .{
-        .data = vec1.data / @Vector(3, f32){@splat(length(vec1))},
+        .data = vec1.data / @Vector(3, f32){ len, len, len },
     };
 }
