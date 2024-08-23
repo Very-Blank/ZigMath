@@ -4,10 +4,8 @@ const constants = @import("constants.zig");
 const quat = @import("quaternion.zig");
 
 pub const ZERO: Vector2 = .{ .data = @Vector(2, f32){ 0.0, 0.0 } };
-pub const UP: Vector2 = .{ .data = @Vector(2, f32){
-    0.0,
-    1.0,
-} };
+pub const ONE: Vector2 = .{ .data = @Vector(2, f32){ 1.0, 1.0 } };
+pub const UP: Vector2 = .{ .data = @Vector(2, f32){ 0.0, 1.0 } };
 pub const RIGHT: Vector2 = .{ .data = @Vector(2, f32){ 1.0, 0.0 } };
 
 pub const Vector2 = struct {

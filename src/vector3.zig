@@ -4,6 +4,7 @@ const constants = @import("constants.zig");
 const quat = @import("quaternion.zig");
 
 pub const ZERO: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 0.0, 0.0 } };
+pub const ONE: Vector3 = .{ .data = @Vector(3, f32){ 1.0, 1.0, 1.0 } };
 pub const UP: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 1.0, 0.0 } };
 pub const RIGHT: Vector3 = .{ .data = @Vector(3, f32){ 1.0, 0.0, 0.0 } };
 pub const FORWARD: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 0.0, 1.0 } };
