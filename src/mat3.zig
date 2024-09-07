@@ -118,11 +118,10 @@ pub fn createRotation(rot: quat.Quaternion) Mat3 {
 
 pub fn createScale(scale: vec3.Vector3) Mat3 {
     return .{
-        .fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ scale.data[0], 0.0, 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, scale.data[1], 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 0.0, scale.data[2], 0.0 },
-            @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
+        .fields = [3]@Vector(3, f32){
+            @Vector(4, f32){ scale.data[0], 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, scale.data[1], 0.0 },
+            @Vector(4, f32){ 0.0, 0.0, scale.data[2] },
         },
     };
 }
