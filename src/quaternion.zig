@@ -75,7 +75,7 @@ pub fn createFromRadians(radians: f32, axis: constants.Axis) Quaternion {
 
 // Uses x, y, z order
 pub fn createFromVector(vector3: vec3.Vector3) Quaternion {
-    return multiply(multiply(createFromRadians(vector3.x, constants.Axis.x), createFromRadians(vector3.y, constants.Axis.y)), createFromRadians(vector3.z, constants.Axis.z));
+    return multiply(multiply(createFromRadians(vector3.data[0], constants.Axis.x), createFromRadians(vector3.data[1], constants.Axis.y)), createFromRadians(vector3.data[2], constants.Axis.z));
 }
 
 // Hamilton product
