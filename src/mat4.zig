@@ -57,10 +57,10 @@ pub const Mat4 = struct {
 
     pub fn setOrtho(self: *Mat4, left: f32, right: f32, bottom: f32, top: f32, zNear: f32, zFar: f32) void {
         self.fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ 2.0 / (right - left), 0.0, 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 2.0 / (top - bottom), 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 0.0, -1.0 / (zFar - zNear), -1.0 },
-            @Vector(4, f32){ -(right + left) / (right - left), -(top + bottom) / (top - bottom), -zNear / (zFar - zNear), 1.0 },
+            @Vector(4, f32){ 2.0 / (right - left), 0.0, 0.0, -(right + left) / (right - left) },
+            @Vector(4, f32){ 0.0, 2.0 / (top - bottom), 0.0, -(top + bottom) / (top - bottom) },
+            @Vector(4, f32){ 0.0, 0.0, -1.0 / (zFar - zNear), -zNear / (zFar - zNear) },
+            @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         };
     }
 
@@ -156,10 +156,10 @@ pub fn createPerspective(fov: f32, aspect: f32, near: f32, far: f32) Mat4 {
 
 pub fn createOrtho(left: f32, right: f32, bottom: f32, top: f32, zNear: f32, zFar: f32) Mat4 {
     return .{ .fields = [4]@Vector(4, f32){
-        @Vector(4, f32){ 2.0 / (right - left), 0.0, 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 2.0 / (top - bottom), 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 0.0, -1.0 / (zFar - zNear), -1.0 },
-        @Vector(4, f32){ -(right + left) / (right - left), -(top + bottom) / (top - bottom), -zNear / (zFar - zNear), 1.0 },
+        @Vector(4, f32){ 2.0 / (right - left), 0.0, 0.0, -(right + left) / (right - left) },
+        @Vector(4, f32){ 0.0, 2.0 / (top - bottom), 0.0, -(top + bottom) / (top - bottom) },
+        @Vector(4, f32){ 0.0, 0.0, -1.0 / (zFar - zNear), -zNear / (zFar - zNear) },
+        @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
     } };
 }
 
