@@ -8,17 +8,17 @@ pub const Quaternion = struct {
         switch (axis) {
             .x => {
                 return .{
-                    .data = @Vector(4, f32){ @cos(radians / 2), @sin(radians / 2), 0, 0 },
+                    .fields = @Vector(4, f32){ @cos(radians / 2), @sin(radians / 2), 0, 0 },
                 };
             },
             .y => {
                 return .{
-                    .data = @Vector(4, f32){ @cos(radians / 2), 0, @sin(radians / 2), 0 },
+                    .fields = @Vector(4, f32){ @cos(radians / 2), 0, @sin(radians / 2), 0 },
                 };
             },
             .z => {
                 return .{
-                    .data = @Vector(4, f32){ @cos(radians / 2), 0, 0, @sin(radians / 2) },
+                    .fields = @Vector(4, f32){ @cos(radians / 2), 0, 0, @sin(radians / 2) },
                 };
             },
         }
@@ -43,17 +43,17 @@ pub const Quaternion = struct {
         switch (axis) {
             .x => {
                 return .{
-                    .data = @Vector(4, f32){ @cos(radians / 2), @sin(radians / 2), 0, 0 },
+                    .fields = @Vector(4, f32){ @cos(radians / 2), @sin(radians / 2), 0, 0 },
                 };
             },
             .y => {
                 return .{
-                    .data = @Vector(4, f32){ @cos(radians / 2), 0, @sin(radians / 2), 0 },
+                    .fields = @Vector(4, f32){ @cos(radians / 2), 0, @sin(radians / 2), 0 },
                 };
             },
             .z => {
                 return .{
-                    .data = @Vector(4, f32){ @cos(radians / 2), 0, 0, @sin(radians / 2) },
+                    .fields = @Vector(4, f32){ @cos(radians / 2), 0, 0, @sin(radians / 2) },
                 };
             },
         }
