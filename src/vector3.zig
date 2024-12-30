@@ -1,252 +1,199 @@
 const std = @import("std");
-const math = std.math;
-const constants = @import("constants.zig");
 const quat = @import("quaternion.zig");
-
-pub const ZERO: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 0.0, 0.0 } };
-pub const ONE: Vector3 = .{ .data = @Vector(3, f32){ 1.0, 1.0, 1.0 } };
-pub const UP: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 1.0, 0.0 } };
-pub const RIGHT: Vector3 = .{ .data = @Vector(3, f32){ 1.0, 0.0, 0.0 } };
-pub const FORWARD: Vector3 = .{ .data = @Vector(3, f32){ 0.0, 0.0, 1.0 } };
+const math = std.math;
 
 pub const Vector3 = struct {
-    data: @Vector(3, f32),
-
-    pub inline fn setZERO(self: *Vector3) void {
-        self.data = @Vector(3, f32){ 0.0, 0.0, 0.0 };
-    }
-
-    pub inline fn setUP(self: *Vector3) void {
-        self.data = @Vector(3, f32){ 0.0, 1.0, 0.0 };
-    }
-
-    pub inline fn setRIGHT(self: *Vector3) void {
-        self.data = @Vector(3, f32){ 1.0, 0.0, 0.0 };
-    }
-
-    pub inline fn setFORWARD(self: *Vector3) void {
-        self.data = @Vector(3, f32){ 0.0, 0.0, 1.0 };
-    }
-
-    pub inline fn floatSet(self: *Vector3, floatx: f32, floaty: f32, floatz: f32) void {
-        self.data = @Vector(3, f32){ floatx, floaty, floatz };
-    }
-
-    pub inline fn vectorSet(self: *Vector3, vector: Vector3) void {
-        self.data = vector.data;
-    }
-
-    pub inline fn dataSet(self: *Vector3, data: @Vector(3, f32)) void {
-        self.data = data;
-    }
+    x: f32,
+    y: f32,
+    z: f32,
 
     pub inline fn setAdd(self: *Vector3, other: Vector3) void {
-        self.data += other.data;
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
     }
 
     pub inline fn setSubtract(self: *Vector3, other: Vector3) void {
-        self.data -= other.data;
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
     }
 
     pub inline fn setMultiply(self: *Vector3, other: Vector3) void {
-        self.data *= other.data;
+        self.x *= other.x;
+        self.y *= other.y;
+        self.z *= other.z;
     }
 
     pub inline fn setDivide(self: *Vector3, other: Vector3) void {
-        self.data /= other.data;
+        self.x /= other.x;
+        self.y /= other.y;
+        self.z /= other.z;
     }
 
-    pub inline fn setScale(self: *Vector3, other: f32) void {
-        self.data = @Vector(3, f32){
-            self.data[0] * other,
-            self.data[1] * other,
-            self.data[2] * other,
-        };
+    pub inline fn setScale(self: *Vector3, scalar: f32) void {
+        self.x *= scalar;
+        self.y *= scalar;
+        self.z *= scalar;
     }
 
-    pub inline fn setSegment(self: *Vector3, other: f32) void {
-        self.data = @Vector(3, f32){
-            self.data[0] / other,
-            self.data[1] / other,
-            self.data[2] / other,
-        };
+    pub inline fn setSegment(self: *Vector3, scalar: f32) void {
+        self.x /= scalar;
+        self.y /= scalar;
+        self.z /= scalar;
     }
 
     pub inline fn setNegate(self: *Vector3) void {
-        self.data = -self.data;
+        self.x = -self.x;
+        self.y = -self.y;
+        self.z = -self.z;
     }
 
     pub inline fn setCross(self: *Vector3, other: Vector3) void {
-        self.data = @Vector(3, f32){
-            (self.data[1] * other.data[2] - self.data[2] * other.data[1]),
-            (self.data[2] * other.data[0] - self.data[0] * other.data[2]),
-            (self.data[0] * other.data[1] - self.data[1] * other.data[0]),
-        };
+        self.x = self.y * other.z - self.z * other.y;
+        self.y = self.z * other.x - self.x * other.z;
+        self.z = self.x * other.y - self.y * other.x;
     }
 
     pub inline fn setRotate(self: *Vector3, rot: quat.Quaternion) void {
-        const qVec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
-        const uv = crossData(qVec, self.data);
-        const uuv = crossData(qVec, uv);
-        self.data = self.data + ((uv * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + uuv) * @Vector(3, f32){ 2.0, 2.0, 2.0 };
+        const qVec = Vector3{
+            .x = rot.fields[1],
+            .y = rot.fields[2],
+            .z = rot.fields[3],
+        };
+
+        const uv = cross(qVec, self.data);
+        const uuv = cross(qVec, uv);
+        self.setAdd(
+            Vector3.multiply(
+                Vector3.add(
+                    Vector3.multiply(
+                        uv,
+                        .{
+                            .x = rot.fields[0],
+                            .y = rot.fields[0],
+                            .z = rot.fields[0],
+                        },
+                    ),
+                    uuv,
+                ),
+                .{ .x = 2.0, .y = 2.0, .z = 2.0 },
+            ),
+        );
     }
 
     pub inline fn setNormalize(self: *Vector3) void {
-        const len: f32 = getLength(self);
-        if (len > 0) {
-            self.data = self.data / @Vector(3, f32){ len, len, len };
-        }
+        self.setSegment(length(self));
     }
 
-    pub inline fn getLength(self: *Vector3) f32 {
-        return @sqrt(math.pow(f32, self.data[0], 2.0) + math.pow(f32, self.data[1], 2.0) + math.pow(f32, self.data[2], 2.0));
+    // NOTE: non set functions
+
+    pub inline fn add(vec1: Vector3, vec2: Vector3) Vector3 {
+        return Vector3{
+            .x = vec1.x + vec2.x,
+            .y = vec1.y + vec2.y,
+            .z = vec1.z + vec2.z,
+        };
     }
 
-    pub inline fn getDot(self: *Vector3, vec2: Vector3) f32 {
-        return self.data[0] * vec2.data[0] + self.data[1] * vec2.data[1] + self.data[2] * vec2.data[2];
+    pub inline fn subtract(vec1: Vector3, vec2: Vector3) Vector3 {
+        return Vector3{
+            .x = vec1.x - vec2.x,
+            .y = vec1.y - vec2.y,
+            .z = vec1.z - vec2.z,
+        };
     }
 
-    pub inline fn getDistance(self: *Vector3, vec2: Vector3) f32 {
-        return @sqrt(math.pow(f32, vec2.data[0] - self.data[0], 2.0) + math.pow(f32, vec2.data[1] - self.data[1], 2.0) + math.pow(f32, vec2.data[2] - self.data[2], 2.0));
+    pub inline fn multiply(vec1: Vector3, vec2: Vector3) Vector3 {
+        return Vector3{
+            .x = vec1.x * vec2.x,
+            .y = vec1.y * vec2.y,
+            .z = vec1.z * vec2.z,
+        };
+    }
+
+    pub inline fn divide(vec1: Vector3, vec2: Vector3) Vector3 {
+        return Vector3{
+            .x = vec1.x / vec2.x,
+            .y = vec1.y / vec2.y,
+            .z = vec1.z / vec2.z,
+        };
+    }
+
+    pub inline fn scale(vec1: Vector3, scalar: f32) Vector3 {
+        return Vector3{
+            .x = vec1.x * scalar,
+            .y = vec1.y * scalar,
+            .z = vec1.z * scalar,
+        };
+    }
+
+    pub inline fn segment(vec1: Vector3, scalar: f32) Vector3 {
+        return Vector3{
+            .x = vec1.x / scalar,
+            .y = vec1.y / scalar,
+            .z = vec1.z / scalar,
+        };
+    }
+
+    pub inline fn negate(vec1: Vector3) Vector3 {
+        return Vector3{
+            .x = -vec1.x,
+            .y = -vec1.y,
+            .z = -vec1.z,
+        };
+    }
+
+    pub inline fn dot(vec1: Vector3, vec2: Vector3) f32 {
+        return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+    }
+
+    pub inline fn cross(vec1: Vector3, vec2: Vector3) Vector3 {
+        return Vector3{
+            .x = vec1.y * vec2.z - vec1.z * vec2.y,
+            .y = vec1.z * vec2.x - vec1.x * vec2.z,
+            .z = vec1.x * vec2.y - vec1.y * vec2.x,
+        };
+    }
+
+    pub inline fn rotate(vec1: Vector3, rot: quat.Quaternion) Vector3 {
+        const qVec = Vector3{
+            .x = rot.fields[1],
+            .y = rot.fields[2],
+            .z = rot.fields[3],
+        };
+
+        const uv = cross(qVec, vec1.data);
+        const uuv = cross(qVec, uv);
+        vec1.setAdd(
+            Vector3.multiply(
+                Vector3.add(
+                    Vector3.multiply(
+                        uv,
+                        .{
+                            .x = rot.fields[0],
+                            .y = rot.fields[0],
+                            .z = rot.fields[0],
+                        },
+                    ),
+                    uuv,
+                ),
+                .{ .x = 2.0, .y = 2.0, .z = 2.0 },
+            ),
+        );
+
+        return vec1;
+    }
+
+    pub inline fn length(vec1: Vector3) f32 {
+        return @sqrt(math.pow(f32, vec1.x, 2.0) + math.pow(f32, vec1.y, 2.0) + math.pow(f32, vec1.z, 2.0));
+    }
+
+    pub inline fn distance(vec1: Vector3, vec2: Vector3) f32 {
+        return @sqrt(math.pow(f32, vec2.x - vec1.x, 2.0) + math.pow(f32, vec2.y - vec1.y, 2.0) + math.pow(f32, vec2.z - vec1.z, 2.0));
+    }
+
+    pub inline fn normalize(vec1: Vector3) Vector3 {
+        return Vector3.segment(vec1, length(vec1));
     }
 };
-
-pub inline fn createZERO() Vector3 {
-    return .{
-        .data = @Vector(3, f32){ 0.0, 0.0, 0.0 },
-    };
-}
-
-pub inline fn createUP() Vector3 {
-    return .{
-        .data = @Vector(3, f32){ 0.0, 1.0, 0.0 },
-    };
-}
-
-pub inline fn createRIGHT() Vector3 {
-    return .{
-        .data = @Vector(3, f32){ 1.0, 0.0, 0.0 },
-    };
-}
-
-pub inline fn createFORWARD() Vector3 {
-    return .{
-        .data = @Vector(3, f32){ 0.0, 0.0, 1.0 },
-    };
-}
-
-pub inline fn floatCreate(floatx: f32, floaty: f32, floatz: f32) Vector3 {
-    return .{
-        .data = @Vector(3, f32){ floatx, floaty, floatz },
-    };
-}
-
-pub inline fn vectorCreate(vector: Vector3) Vector3 {
-    return .{
-        .data = vector.data,
-    };
-}
-
-pub inline fn dataCreate(data: @Vector(3, f32)) Vector3 {
-    return .{
-        .data = data,
-    };
-}
-
-pub inline fn add(vec1: Vector3, vec2: Vector3) Vector3 {
-    return .{
-        .data = vec1.data + vec2.data,
-    };
-}
-
-pub inline fn subtract(vec1: Vector3, vec2: Vector3) Vector3 {
-    return .{
-        .data = vec1.data - vec2.data,
-    };
-}
-
-pub inline fn multiply(vec1: Vector3, vec2: Vector3) Vector3 {
-    return .{
-        .data = vec1.data * vec2.data,
-    };
-}
-
-pub inline fn divide(vec1: Vector3, vec2: Vector3) Vector3 {
-    return .{
-        .data = vec1.data / vec2.data,
-    };
-}
-
-pub inline fn scale(vec1: Vector3, float: f32) Vector3 {
-    return .{
-        .data = @Vector(3, f32){
-            vec1.data[0] * float,
-            vec1.data[1] * float,
-            vec1.data[2] * float,
-        },
-    };
-}
-
-pub inline fn segment(vec1: Vector3, float: f32) Vector3 {
-    return .{
-        .data = @Vector(3, f32){
-            vec1.data[0] / float,
-            vec1.data[1] / float,
-            vec1.data[2] / float,
-        },
-    };
-}
-
-pub inline fn negate(vec1: Vector3) Vector3 {
-    return .{
-        .data = -vec1.data,
-    };
-}
-
-pub inline fn dot(vec1: Vector3, vec2: Vector3) f32 {
-    return vec1.data[0] * vec2.data[0] + vec1.data[1] * vec2.data[1] + vec1.data[2] * vec2.data[2];
-}
-
-pub inline fn dotData(vec1: @Vector(3, f32), vec2: @Vector(3, f32)) f32 {
-    return vec1[0] * vec2[0] + vec1[1] * vec2[1] + vec1[2] * vec2[2];
-}
-
-pub inline fn cross(vec1: Vector3, vec2: Vector3) Vector3 {
-    return .{
-        .data = @Vector(3, f32){
-            (vec1.data[1] * vec2.data[2] - vec1.data[2] * vec2.data[1]),
-            (vec1.data[2] * vec2.data[0] - vec1.data[0] * vec2.data[2]),
-            (vec1.data[0] * vec2.data[1] - vec1.data[1] * vec2.data[0]),
-        },
-    };
-}
-
-pub inline fn crossData(vec1: @Vector(3, f32), vec2: @Vector(3, f32)) @Vector(3, f32) {
-    return @Vector(3, f32){
-        (vec1[1] * vec2[2] - vec1[2] * vec2[1]),
-        (vec1[2] * vec2[0] - vec1[0] * vec2[2]),
-        (vec1[0] * vec2[1] - vec1[1] * vec2[0]),
-    };
-}
-
-pub inline fn rotate(vec1: Vector3, rot: quat.Quaternion) Vector3 {
-    const qVec = @Vector(3, f32){ rot.data[1], rot.data[2], rot.data[3] };
-    const uv = crossData(qVec, vec1.data);
-    const uuv = crossData(qVec, uv);
-    vec1.data = vec1.data + ((uv * @Vector(3, f32){ rot.data[0], rot.data[0], rot.data[0] }) + uuv) * @Vector(3, f32){ 2.0, 2.0, 2.0 };
-}
-
-pub inline fn length(vec1: Vector3) f32 {
-    return @sqrt(math.pow(f32, vec1.data[0], 2.0) + math.pow(f32, vec1.data[1], 2.0) + math.pow(f32, vec1.data[2], 2.0));
-}
-
-pub inline fn distance(vec1: Vector3, vec2: Vector3) f32 {
-    return @sqrt(math.pow(f32, vec2.data[0] - vec1.data[0], 2.0) + math.pow(f32, vec2.data[1] - vec1.data[1], 2.0) + math.pow(f32, vec2.data[2] - vec1.data[2], 2.0));
-}
-
-pub inline fn normalize(vec1: Vector3) Vector3 {
-    const len: f32 = length(vec1);
-    return .{
-        .data = vec1.data / @Vector(3, f32){ len, len, len },
-    };
-}

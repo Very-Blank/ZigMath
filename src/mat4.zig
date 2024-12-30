@@ -3,25 +3,6 @@ const vec3 = @import("vector3.zig");
 const quat = @import("quaternion.zig");
 const math = std.math;
 
-/// zero matrix.
-pub const ZERO = Mat4{
-    .fields = [4]@Vector(4, f32){
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
-    },
-};
-
-pub const IDENTITY = Mat4{
-    .fields = [4]@Vector(4, f32){
-        @Vector(4, f32){ 1.0, 0.0, 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 1.0, 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 0.0, 1.0, 0.0 },
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
-    },
-};
-
 pub const Mat4 = struct {
     fields: [4]@Vector(4, f32),
 
@@ -68,21 +49,21 @@ pub const Mat4 = struct {
         // column major
         self.fields = [4]@Vector(4, f32){
             @Vector(4, f32){
-                1.0 - 2 * (math.pow(f32, rot.data[2], 2.0) + math.pow(f32, rot.data[3], 2.0)),
-                2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]),
-                2 * (rot.data[1] * rot.data[3] - rot.data[2] * rot.data[0]),
+                1.0 - 2 * (math.pow(f32, rot.fields[2], 2.0) + math.pow(f32, rot.fields[3], 2.0)),
+                2 * (rot.fields[1] * rot.fields[2] + rot.fields[3] * rot.fields[0]),
+                2 * (rot.fields[1] * rot.fields[3] - rot.fields[2] * rot.fields[0]),
                 0.0,
             },
             @Vector(4, f32){
-                2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]),
-                1.0 - 2 * (math.pow(f32, rot.data[1], 2.0) + math.pow(f32, rot.data[3], 2.0)),
-                2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]),
+                2 * (rot.fields[1] * rot.fields[2] - rot.fields[3] * rot.fields[0]),
+                1.0 - 2 * (math.pow(f32, rot.fields[1], 2.0) + math.pow(f32, rot.fields[3], 2.0)),
+                2 * (rot.fields[2] * rot.fields[3] + rot.fields[1] * rot.fields[0]),
                 0.0,
             },
             @Vector(4, f32){
-                2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]),
-                2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]),
-                1.0 - 2 * (math.pow(f32, rot.data[1], 2.0) + math.pow(f32, rot.data[2], 2.0)),
+                2 * (rot.fields[1] * rot.fields[3] + rot.fields[2] * rot.fields[0]),
+                2 * (rot.fields[2] * rot.fields[3] - rot.fields[1] * rot.fields[0]),
+                1.0 - 2 * (math.pow(f32, rot.fields[1], 2.0) + math.pow(f32, rot.fields[2], 2.0)),
                 0.0,
             },
             @Vector(4, f32){
@@ -167,21 +148,21 @@ pub fn createRotation(rot: quat.Quaternion) Mat4 {
     return .{
         .fields = [4]@Vector(4, f32){
             @Vector(4, f32){
-                1.0 - 2 * (math.pow(f32, rot.data[2], 2.0) + math.pow(f32, rot.data[3], 2.0)),
-                2 * (rot.data[1] * rot.data[2] + rot.data[3] * rot.data[0]),
-                2 * (rot.data[1] * rot.data[3] - rot.data[2] * rot.data[0]),
+                1.0 - 2 * (math.pow(f32, rot.fields[2], 2.0) + math.pow(f32, rot.fields[3], 2.0)),
+                2 * (rot.fields[1] * rot.fields[2] + rot.fields[3] * rot.fields[0]),
+                2 * (rot.fields[1] * rot.fields[3] - rot.fields[2] * rot.fields[0]),
                 0.0,
             },
             @Vector(4, f32){
-                2 * (rot.data[1] * rot.data[2] - rot.data[3] * rot.data[0]),
-                1.0 - 2 * (math.pow(f32, rot.data[1], 2.0) + math.pow(f32, rot.data[3], 2.0)),
-                2 * (rot.data[2] * rot.data[3] + rot.data[1] * rot.data[0]),
+                2 * (rot.fields[1] * rot.fields[2] - rot.fields[3] * rot.fields[0]),
+                1.0 - 2 * (math.pow(f32, rot.fields[1], 2.0) + math.pow(f32, rot.fields[3], 2.0)),
+                2 * (rot.fields[2] * rot.fields[3] + rot.fields[1] * rot.fields[0]),
                 0.0,
             },
             @Vector(4, f32){
-                2 * (rot.data[1] * rot.data[3] + rot.data[2] * rot.data[0]),
-                2 * (rot.data[2] * rot.data[3] - rot.data[1] * rot.data[0]),
-                1.0 - 2 * (math.pow(f32, rot.data[1], 2.0) + math.pow(f32, rot.data[2], 2.0)),
+                2 * (rot.fields[1] * rot.fields[3] + rot.fields[2] * rot.fields[0]),
+                2 * (rot.fields[2] * rot.fields[3] - rot.fields[1] * rot.fields[0]),
+                1.0 - 2 * (math.pow(f32, rot.fields[1], 2.0) + math.pow(f32, rot.fields[2], 2.0)),
                 0.0,
             },
             @Vector(4, f32){
