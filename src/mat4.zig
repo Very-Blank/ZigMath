@@ -100,111 +100,107 @@ pub const Mat4 = struct {
     pub inline fn setModel(self: *Mat4, position: vec3.Vector3, scale: vec3.Vector3, rotation: quat.Quaternion) void {
         self.fields = multiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale)).fields;
     }
-};
 
-pub fn multiply(mat1: Mat4, mat2: Mat4) Mat4 {
-    var result: [4]@Vector(4, f32) = [4]@Vector(4, f32){
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
-    };
+    pub fn multiply(mat1: Mat4, mat2: Mat4) Mat4 {
+        var result: [4]@Vector(4, f32) = [4]@Vector(4, f32){
+            @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, 0.0, 0.0, 0.0 },
+        };
 
-    for (0..4) |i| {
-        for (0..4) |j| {
-            for (0..4) |k| {
-                result[i][j] += mat1.fields[i][k] * mat2.fields[k][j];
+        for (0..4) |i| {
+            for (0..4) |j| {
+                for (0..4) |k| {
+                    result[i][j] += mat1.fields[i][k] * mat2.fields[k][j];
+                }
             }
         }
+
+        return .{
+            .fields = result,
+        };
     }
 
-    return .{
-        .fields = result,
-    };
-}
-
-pub fn createPerspective(fov: f32, aspect: f32, near: f32, far: f32) Mat4 {
-    std.debug.assert(@abs(aspect - 0.001) > 0);
-    return .{
-        .fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ 1.0 / (aspect * @tan(fov / 2)), 0.0, 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 1.0 / @tan(fov / 2), 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 0.0, -(far + near) / (far - near), -1.0 },
-            @Vector(4, f32){ 0.0, 0.0, -(2.0 * far * near) / (far - near), 0.0 },
-        },
-    };
-}
-
-pub fn createOrtho(left: f32, right: f32, bottom: f32, top: f32, zNear: f32, zFar: f32) Mat4 {
-    return .{ .fields = [4]@Vector(4, f32){
-        @Vector(4, f32){ 2.0 / (right - left), 0.0, 0.0, -(right + left) / (right - left) },
-        @Vector(4, f32){ 0.0, 2.0 / (top - bottom), 0.0, -(top + bottom) / (top - bottom) },
-        @Vector(4, f32){ 0.0, 0.0, -1.0 / (zFar - zNear), -zNear / (zFar - zNear) },
-        @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
-    } };
-}
-
-pub fn createRotation(rot: quat.Quaternion) Mat4 {
-    return .{
-        .fields = [4]@Vector(4, f32){
-            @Vector(4, f32){
-                1.0 - 2 * (math.pow(f32, rot.fields[2], 2.0) + math.pow(f32, rot.fields[3], 2.0)),
-                2 * (rot.fields[1] * rot.fields[2] + rot.fields[3] * rot.fields[0]),
-                2 * (rot.fields[1] * rot.fields[3] - rot.fields[2] * rot.fields[0]),
-                0.0,
+    pub fn createPerspective(fov: f32, aspect: f32, near: f32, far: f32) Mat4 {
+        std.debug.assert(@abs(aspect - 0.001) > 0);
+        return .{
+            .fields = [4]@Vector(4, f32){
+                @Vector(4, f32){ 1.0 / (aspect * @tan(fov / 2)), 0.0, 0.0, 0.0 },
+                @Vector(4, f32){ 0.0, 1.0 / @tan(fov / 2), 0.0, 0.0 },
+                @Vector(4, f32){ 0.0, 0.0, -(far + near) / (far - near), -1.0 },
+                @Vector(4, f32){ 0.0, 0.0, -(2.0 * far * near) / (far - near), 0.0 },
             },
-            @Vector(4, f32){
-                2 * (rot.fields[1] * rot.fields[2] - rot.fields[3] * rot.fields[0]),
-                1.0 - 2 * (math.pow(f32, rot.fields[1], 2.0) + math.pow(f32, rot.fields[3], 2.0)),
-                2 * (rot.fields[2] * rot.fields[3] + rot.fields[1] * rot.fields[0]),
-                0.0,
-            },
-            @Vector(4, f32){
-                2 * (rot.fields[1] * rot.fields[3] + rot.fields[2] * rot.fields[0]),
-                2 * (rot.fields[2] * rot.fields[3] - rot.fields[1] * rot.fields[0]),
-                1.0 - 2 * (math.pow(f32, rot.fields[1], 2.0) + math.pow(f32, rot.fields[2], 2.0)),
-                0.0,
-            },
-            @Vector(4, f32){
-                0.0,
-                0.0,
-                0.0,
-                1.0,
-            },
-        },
-    };
-}
+        };
+    }
 
-pub fn createScale(scale: vec3.Vector3) Mat4 {
-    return .{
-        .fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ scale.data[0], 0.0, 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, scale.data[1], 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 0.0, scale.data[2], 0.0 },
+    pub fn createOrtho(left: f32, right: f32, bottom: f32, top: f32, zNear: f32, zFar: f32) Mat4 {
+        return .{ .fields = [4]@Vector(4, f32){
+            @Vector(4, f32){ 2.0 / (right - left), 0.0, 0.0, -(right + left) / (right - left) },
+            @Vector(4, f32){ 0.0, 2.0 / (top - bottom), 0.0, -(top + bottom) / (top - bottom) },
+            @Vector(4, f32){ 0.0, 0.0, -1.0 / (zFar - zNear), -zNear / (zFar - zNear) },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
-        },
-    };
-}
+        } };
+    }
 
-pub fn createTranslate(vector: vec3.Vector3) Mat4 {
-    return .{
-        .fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ 1.0, 0.0, 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 1.0, 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 0.0, 1.0, 0.0 },
-            @Vector(4, f32){ vector.data[0], vector.data[1], vector.data[2], 1.0 },
-        },
-    };
-}
+    pub fn createRotation(rot: quat.Quaternion) Mat4 {
+        return .{
+            .fields = [4]@Vector(4, f32){
+                @Vector(4, f32){
+                    1.0 - 2 * (math.pow(f32, rot.fields[2], 2.0) + math.pow(f32, rot.fields[3], 2.0)),
+                    2 * (rot.fields[1] * rot.fields[2] + rot.fields[3] * rot.fields[0]),
+                    2 * (rot.fields[1] * rot.fields[3] - rot.fields[2] * rot.fields[0]),
+                    0.0,
+                },
+                @Vector(4, f32){
+                    2 * (rot.fields[1] * rot.fields[2] - rot.fields[3] * rot.fields[0]),
+                    1.0 - 2 * (math.pow(f32, rot.fields[1], 2.0) + math.pow(f32, rot.fields[3], 2.0)),
+                    2 * (rot.fields[2] * rot.fields[3] + rot.fields[1] * rot.fields[0]),
+                    0.0,
+                },
+                @Vector(4, f32){
+                    2 * (rot.fields[1] * rot.fields[3] + rot.fields[2] * rot.fields[0]),
+                    2 * (rot.fields[2] * rot.fields[3] - rot.fields[1] * rot.fields[0]),
+                    1.0 - 2 * (math.pow(f32, rot.fields[1], 2.0) + math.pow(f32, rot.fields[2], 2.0)),
+                    0.0,
+                },
+                @Vector(4, f32){
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                },
+            },
+        };
+    }
 
-// pub fn createOrhtoPerspective(fov: f32, aspect: f32, near: f32, far: f32) Mat4 {
-// }
+    pub fn createScale(scale: vec3.Vector3) Mat4 {
+        return .{
+            .fields = [4]@Vector(4, f32){
+                @Vector(4, f32){ scale.data[0], 0.0, 0.0, 0.0 },
+                @Vector(4, f32){ 0.0, scale.data[1], 0.0, 0.0 },
+                @Vector(4, f32){ 0.0, 0.0, scale.data[2], 0.0 },
+                @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
+            },
+        };
+    }
 
-//just a shortcuts, they are used alot so
-pub inline fn createView(position: vec3.Vector3, rotation: quat.Quaternion) Mat4 {
-    return multiply(createTranslate(position), createRotation(rotation));
-}
+    pub fn createTranslate(vector: vec3.Vector3) Mat4 {
+        return .{
+            .fields = [4]@Vector(4, f32){
+                @Vector(4, f32){ 1.0, 0.0, 0.0, 0.0 },
+                @Vector(4, f32){ 0.0, 1.0, 0.0, 0.0 },
+                @Vector(4, f32){ 0.0, 0.0, 1.0, 0.0 },
+                @Vector(4, f32){ vector.data[0], vector.data[1], vector.data[2], 1.0 },
+            },
+        };
+    }
 
-pub inline fn createModel(position: vec3.Vector3, scale: vec3.Vector3, rotation: quat.Quaternion) Mat4 {
-    return multiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale));
-}
+    pub inline fn createView(position: vec3.Vector3, rotation: quat.Quaternion) Mat4 {
+        return multiply(createTranslate(position), createRotation(rotation));
+    }
+
+    pub inline fn createModel(position: vec3.Vector3, scale: vec3.Vector3, rotation: quat.Quaternion) Mat4 {
+        return multiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale));
+    }
+};
