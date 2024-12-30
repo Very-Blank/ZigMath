@@ -1,5 +1,5 @@
 const std = @import("std");
-const vec3 = @import("vector3.zig");
+const Vector3 = @import("vector3.zig").Vector3;
 const quat = @import("quaternion.zig");
 const math = std.math;
 
@@ -75,29 +75,29 @@ pub const Mat4 = struct {
         };
     }
 
-    pub fn setScale(self: *Mat4, scale: vec3.Vector3) void {
+    pub fn setScale(self: *Mat4, scale: Vector3) void {
         self.fields = [4]@Vector(4, f32){
-            @Vector(4, f32){ scale.data[0], 0.0, 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, scale.data[1], 0.0, 0.0 },
-            @Vector(4, f32){ 0.0, 0.0, scale.data[2], 0.0 },
+            @Vector(4, f32){ scale.x, 0.0, 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, scale.y, 0.0, 0.0 },
+            @Vector(4, f32){ 0.0, 0.0, scale.z, 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
         };
     }
 
-    pub fn setTranslate(self: *Mat4, vector: vec3.Vector3) void {
+    pub fn setTranslate(self: *Mat4, vector: Vector3) void {
         self.fields = [4]@Vector(4, f32){
             @Vector(4, f32){ 1.0, 0.0, 0.0, 0.0 },
             @Vector(4, f32){ 0.0, 1.0, 0.0, 0.0 },
             @Vector(4, f32){ 0.0, 0.0, 1.0, 0.0 },
-            @Vector(4, f32){ vector.data[0], vector.data[1], vector.data[2], 1.0 },
+            @Vector(4, f32){ vector.x, vector.y, vector.z, 1.0 },
         };
     }
 
-    pub inline fn setView(self: *Mat4, position: vec3.Vector3, rotation: quat.Quaternion) void {
+    pub inline fn setView(self: *Mat4, position: Vector3, rotation: quat.Quaternion) void {
         self.fields = multiply(createTranslate(position), createRotation(rotation)).fields;
     }
 
-    pub inline fn setModel(self: *Mat4, position: vec3.Vector3, scale: vec3.Vector3, rotation: quat.Quaternion) void {
+    pub inline fn setModel(self: *Mat4, position: Vector3, scale: Vector3, rotation: quat.Quaternion) void {
         self.fields = multiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale)).fields;
     }
 
@@ -174,33 +174,33 @@ pub const Mat4 = struct {
         };
     }
 
-    pub fn createScale(scale: vec3.Vector3) Mat4 {
+    pub fn createScale(scale: Vector3) Mat4 {
         return .{
             .fields = [4]@Vector(4, f32){
-                @Vector(4, f32){ scale.data[0], 0.0, 0.0, 0.0 },
-                @Vector(4, f32){ 0.0, scale.data[1], 0.0, 0.0 },
-                @Vector(4, f32){ 0.0, 0.0, scale.data[2], 0.0 },
+                @Vector(4, f32){ scale.x, 0.0, 0.0, 0.0 },
+                @Vector(4, f32){ 0.0, scale.y, 0.0, 0.0 },
+                @Vector(4, f32){ 0.0, 0.0, scale.z, 0.0 },
                 @Vector(4, f32){ 0.0, 0.0, 0.0, 1.0 },
             },
         };
     }
 
-    pub fn createTranslate(vector: vec3.Vector3) Mat4 {
+    pub fn createTranslate(vector: Vector3) Mat4 {
         return .{
             .fields = [4]@Vector(4, f32){
                 @Vector(4, f32){ 1.0, 0.0, 0.0, 0.0 },
                 @Vector(4, f32){ 0.0, 1.0, 0.0, 0.0 },
                 @Vector(4, f32){ 0.0, 0.0, 1.0, 0.0 },
-                @Vector(4, f32){ vector.data[0], vector.data[1], vector.data[2], 1.0 },
+                @Vector(4, f32){ vector.x, vector.y, vector.z, 1.0 },
             },
         };
     }
 
-    pub inline fn createView(position: vec3.Vector3, rotation: quat.Quaternion) Mat4 {
+    pub inline fn createView(position: Vector3, rotation: quat.Quaternion) Mat4 {
         return multiply(createTranslate(position), createRotation(rotation));
     }
 
-    pub inline fn createModel(position: vec3.Vector3, scale: vec3.Vector3, rotation: quat.Quaternion) Mat4 {
+    pub inline fn createModel(position: Vector3, scale: Vector3, rotation: quat.Quaternion) Mat4 {
         return multiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale));
     }
 };
