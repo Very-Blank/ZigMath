@@ -83,7 +83,10 @@ pub const Vector3 = struct {
     }
 
     pub inline fn setNormalize(self: *Vector3) void {
-        self.setSegment(length(self.*));
+        const len: f32 = length(self.*);
+        if (len > 0.0) {
+            self.setSegment(len);
+        }
     }
 
     // NOTE: non set functions
@@ -194,6 +197,11 @@ pub const Vector3 = struct {
     }
 
     pub inline fn normalize(vec1: Vector3) Vector3 {
-        return Vector3.segment(vec1, length(vec1));
+        const len: f32 = length(vec1);
+        if (len > 0.0) {
+            return Vector3.segment(vec1, len);
+        }
+
+        return vec1;
     }
 };
