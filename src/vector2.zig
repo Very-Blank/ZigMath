@@ -42,7 +42,7 @@ pub const Vector2 = struct {
     }
 
     pub inline fn setNormalize(self: *Vector2) void {
-        self.setSegment(length(self));
+        self.setSegment(length(self.*));
     }
 
     // NOTE: non set functions
