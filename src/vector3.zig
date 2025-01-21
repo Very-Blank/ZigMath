@@ -1,6 +1,7 @@
 const std = @import("std");
 const quat = @import("quaternion.zig");
 const math = std.math;
+const Vector2 = @import("vector2.zig").Vector2;
 
 pub const Vector3 = struct {
     x: f32,
@@ -90,6 +91,13 @@ pub const Vector3 = struct {
     }
 
     // NOTE: non set functions
+
+    pub inline fn vector3To2(self: *const Vector3) Vector2 {
+        return .{
+            .x = self.x,
+            .y = self.y,
+        };
+    }
 
     pub inline fn add(vec1: Vector3, vec2: Vector3) Vector3 {
         return Vector3{
