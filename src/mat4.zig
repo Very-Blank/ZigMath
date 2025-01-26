@@ -98,7 +98,13 @@ pub const Mat4 = struct {
     }
 
     pub inline fn setModel(self: *Mat4, position: Vector3, scale: Vector3, rotation: quat.Quaternion) void {
-        self.fields = multiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale)).fields;
+        self.fields = multiply(
+            multiply(
+                createRotation(rotation),
+                createScale(scale),
+            ),
+            createTranslate(position),
+        ).fields;
     }
 
     pub fn multiply(mat1: Mat4, mat2: Mat4) Mat4 {
@@ -201,6 +207,12 @@ pub const Mat4 = struct {
     }
 
     pub inline fn createModel(position: Vector3, scale: Vector3, rotation: quat.Quaternion) Mat4 {
-        return multiply(multiply(createTranslate(position), createRotation(rotation)), createScale(scale));
+        return multiply(
+            multiply(
+                createRotation(rotation),
+                createScale(scale),
+            ),
+            createTranslate(position),
+        );
     }
 };
