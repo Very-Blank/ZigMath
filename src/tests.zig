@@ -74,7 +74,7 @@ test "Vector3 float multiplication" {
 
     try std.testing.expectEqual(zigmath.Vec3.Vector3(f32){ .x = -6, .y = 6, .z = -40 }, vec1.multiply(vec2));
     try std.testing.expectEqual(zigmath.Vec3.Vector3(f32){ .x = 2, .y = 3, .z = -5 }, vec1);
-    vec1.setAdd(vec2);
+    vec1.setMultiply(vec2);
     try std.testing.expectEqual(zigmath.Vec3.Vector3(f32){ .x = -6, .y = 6, .z = -40 }, vec1);
 }
 
@@ -84,7 +84,7 @@ test "Vector3 signed integer multiplication" {
 
     try std.testing.expectEqual(zigmath.Vec3.Vector3(i32){ .x = -6, .y = 6, .z = -40 }, vec1.multiply(vec2));
     try std.testing.expectEqual(zigmath.Vec3.Vector3(i32){ .x = 2, .y = 3, .z = -5 }, vec1);
-    vec1.setAdd(vec2);
+    vec1.setMultiply(vec2);
     try std.testing.expectEqual(zigmath.Vec3.Vector3(i32){ .x = -6, .y = 6, .z = -40 }, vec1);
 }
 
@@ -92,8 +92,8 @@ test "Vector3 unsigned integer multiplication" {
     var vec1: zigmath.Vec3.Vector3(u32) = .{ .x = 2, .y = 3, .z = 5 };
     const vec2: zigmath.Vec3.Vector3(u32) = .{ .x = 3, .y = 2, .z = 8 };
 
-    try std.testing.expectEqual(zigmath.Vec3.Vector3(u32){ .x = 6, .y = 6, .z = 40 }, vec1.add(vec2));
+    try std.testing.expectEqual(zigmath.Vec3.Vector3(u32){ .x = 6, .y = 6, .z = 40 }, vec1.multiply(vec2));
     try std.testing.expectEqual(zigmath.Vec3.Vector3(u32){ .x = 2, .y = 3, .z = 5 }, vec1);
-    vec1.setAdd(vec2);
+    vec1.setMultiply(vec2);
     try std.testing.expectEqual(zigmath.Vec3.Vector3(u32){ .x = 6, .y = 6, .z = 40 }, vec1);
 }
