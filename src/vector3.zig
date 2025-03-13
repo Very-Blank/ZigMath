@@ -1,215 +1,326 @@
 const std = @import("std");
 const quat = @import("quaternion.zig");
 const math = std.math;
-const Vector2 = @import("vector2.zig").Vector2;
+const Vec2 = @import("vector2.zig");
 
-pub const Vector3 = struct {
-    x: f32,
-    y: f32,
-    z: f32,
-
-    pub inline fn setAdd(self: *Vector3, other: Vector3) void {
-        self.x += other.x;
-        self.y += other.y;
-        self.z += other.z;
+pub fn Vector3(comptime T: type) type {
+    switch (@typeInfo(T)) {
+        .int, .float, .comptime_int, .comptime_float => {},
+        else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type"),
     }
 
-    pub inline fn setSubtract(self: *Vector3, other: Vector3) void {
-        self.x -= other.x;
-        self.y -= other.y;
-        self.z -= other.z;
-    }
+    return struct {
+        x: T,
+        y: T,
+        z: T,
 
-    pub inline fn setMultiply(self: *Vector3, other: Vector3) void {
-        self.x *= other.x;
-        self.y *= other.y;
-        self.z *= other.z;
-    }
+        pub const zero: Vector3(T) = .{ .x = 0.0, .y = 0.0, .z = 0.0 };
+        pub const one: Vector3(T) = .{ .x = 1.0, .y = 1.0, .z = 1.0 };
+        pub const up: Vector3(T) = .{ .x = 0.0, .y = 1.0, .z = 0.0 };
+        pub const right: Vector3(T) = .{ .x = 1.0, .y = 0.0, .z = 0.0 };
+        pub const forward: Vector3(T) = .{ .x = 0.0, .y = 0.0, .z = 1.0 };
 
-    pub inline fn setDivide(self: *Vector3, other: Vector3) void {
-        self.x /= other.x;
-        self.y /= other.y;
-        self.z /= other.z;
-    }
-
-    pub inline fn setScale(self: *Vector3, scalar: f32) void {
-        self.x *= scalar;
-        self.y *= scalar;
-        self.z *= scalar;
-    }
-
-    pub inline fn setSegment(self: *Vector3, scalar: f32) void {
-        self.x /= scalar;
-        self.y /= scalar;
-        self.z /= scalar;
-    }
-
-    pub inline fn setNegate(self: *Vector3) void {
-        self.x = -self.x;
-        self.y = -self.y;
-        self.z = -self.z;
-    }
-
-    pub inline fn setCross(self: *Vector3, other: Vector3) void {
-        self.x = self.y * other.z - self.z * other.y;
-        self.y = self.z * other.x - self.x * other.z;
-        self.z = self.x * other.y - self.y * other.x;
-    }
-
-    pub inline fn setRotate(self: *Vector3, rot: quat.Quaternion) void {
-        const qVec = Vector3{
-            .x = rot.fields[1],
-            .y = rot.fields[2],
-            .z = rot.fields[3],
-        };
-
-        const uv = cross(qVec, self.data);
-        const uuv = cross(qVec, uv);
-        self.setAdd(
-            Vector3.multiply(
-                Vector3.add(
-                    Vector3.multiply(
-                        uv,
-                        .{
-                            .x = rot.fields[0],
-                            .y = rot.fields[0],
-                            .z = rot.fields[0],
-                        },
-                    ),
-                    uuv,
-                ),
-                .{ .x = 2.0, .y = 2.0, .z = 2.0 },
-            ),
-        );
-    }
-
-    pub inline fn setNormalize(self: *Vector3) void {
-        const len: f32 = length(self.*);
-        if (len > 0.0) {
-            self.setSegment(len);
-        }
-    }
-
-    // NOTE: non set functions
-
-    pub inline fn vector3To2(self: *const Vector3) Vector2 {
-        return .{
-            .x = self.x,
-            .y = self.y,
-        };
-    }
-
-    pub inline fn add(vec1: Vector3, vec2: Vector3) Vector3 {
-        return Vector3{
-            .x = vec1.x + vec2.x,
-            .y = vec1.y + vec2.y,
-            .z = vec1.z + vec2.z,
-        };
-    }
-
-    pub inline fn subtract(vec1: Vector3, vec2: Vector3) Vector3 {
-        return Vector3{
-            .x = vec1.x - vec2.x,
-            .y = vec1.y - vec2.y,
-            .z = vec1.z - vec2.z,
-        };
-    }
-
-    pub inline fn multiply(vec1: Vector3, vec2: Vector3) Vector3 {
-        return Vector3{
-            .x = vec1.x * vec2.x,
-            .y = vec1.y * vec2.y,
-            .z = vec1.z * vec2.z,
-        };
-    }
-
-    pub inline fn divide(vec1: Vector3, vec2: Vector3) Vector3 {
-        return Vector3{
-            .x = vec1.x / vec2.x,
-            .y = vec1.y / vec2.y,
-            .z = vec1.z / vec2.z,
-        };
-    }
-
-    pub inline fn scale(vec1: Vector3, scalar: f32) Vector3 {
-        return Vector3{
-            .x = vec1.x * scalar,
-            .y = vec1.y * scalar,
-            .z = vec1.z * scalar,
-        };
-    }
-
-    pub inline fn segment(vec1: Vector3, scalar: f32) Vector3 {
-        return Vector3{
-            .x = vec1.x / scalar,
-            .y = vec1.y / scalar,
-            .z = vec1.z / scalar,
-        };
-    }
-
-    pub inline fn negate(vec1: Vector3) Vector3 {
-        return Vector3{
-            .x = -vec1.x,
-            .y = -vec1.y,
-            .z = -vec1.z,
-        };
-    }
-
-    pub inline fn dot(vec1: Vector3, vec2: Vector3) f32 {
-        return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
-    }
-
-    pub inline fn cross(vec1: Vector3, vec2: Vector3) Vector3 {
-        return Vector3{
-            .x = vec1.y * vec2.z - vec1.z * vec2.y,
-            .y = vec1.z * vec2.x - vec1.x * vec2.z,
-            .z = vec1.x * vec2.y - vec1.y * vec2.x,
-        };
-    }
-
-    pub inline fn rotate(vec1: Vector3, rot: quat.Quaternion) Vector3 {
-        const qVec = Vector3{
-            .x = rot.fields[1],
-            .y = rot.fields[2],
-            .z = rot.fields[3],
-        };
-
-        const uv = cross(qVec, vec1.data);
-        const uuv = cross(qVec, uv);
-        vec1.setAdd(
-            Vector3.multiply(
-                Vector3.add(
-                    Vector3.multiply(
-                        uv,
-                        .{
-                            .x = rot.fields[0],
-                            .y = rot.fields[0],
-                            .z = rot.fields[0],
-                        },
-                    ),
-                    uuv,
-                ),
-                .{ .x = 2.0, .y = 2.0, .z = 2.0 },
-            ),
-        );
-
-        return vec1;
-    }
-
-    pub inline fn length(vec1: Vector3) f32 {
-        return @sqrt(math.pow(f32, vec1.x, 2.0) + math.pow(f32, vec1.y, 2.0) + math.pow(f32, vec1.z, 2.0));
-    }
-
-    pub inline fn distance(vec1: Vector3, vec2: Vector3) f32 {
-        return @sqrt(math.pow(f32, vec2.x - vec1.x, 2.0) + math.pow(f32, vec2.y - vec1.y, 2.0) + math.pow(f32, vec2.z - vec1.z, 2.0));
-    }
-
-    pub inline fn normalize(vec1: Vector3) Vector3 {
-        const len: f32 = length(vec1);
-        if (len > 0.0) {
-            return Vector3.segment(vec1, len);
+        pub inline fn setAdd(self: *Vector3(T), other: Vector3(T)) void {
+            self.x += other.x;
+            self.y += other.y;
+            self.z += other.z;
         }
 
-        return vec1;
-    }
-};
+        pub inline fn setSubtract(self: *Vector3(T), other: Vector3(T)) void {
+            self.x -= other.x;
+            self.y -= other.y;
+            self.z -= other.z;
+        }
+
+        pub inline fn setMultiply(self: *Vector3(T), other: Vector3(T)) void {
+            self.x *= other.x;
+            self.y *= other.y;
+            self.z *= other.z;
+        }
+
+        pub inline fn setDivide(self: *Vector3(T), other: Vector3(T)) void {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    self.x /= other.x;
+                    self.y /= other.y;
+                    self.z /= other.z;
+                },
+                .int, .comptime_int => |int| {
+                    switch (int.signedness) {
+                        .signed => {
+                            self.x = @divFloor(self.x, other.x);
+                            self.y = @divFloor(self.y, other.y);
+                            self.z = @divFloor(self.z, other.z);
+                        },
+                        .unsigned => {
+                            self.x /= other.x;
+                            self.y /= other.y;
+                            self.z /= other.z;
+                        },
+                    }
+                },
+                else => unreachable,
+            }
+        }
+
+        pub inline fn setScale(self: *Vector3(T), scalar: T) void {
+            self.x *= scalar;
+            self.y *= scalar;
+            self.z *= scalar;
+        }
+
+        pub inline fn setSegment(self: *Vector3(T), scalar: T) void {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    self.x /= scalar;
+                    self.y /= scalar;
+                    self.z /= scalar;
+                },
+                .int, .comptime_int => |int| {
+                    switch (int.signedness) {
+                        .signed => {
+                            self.x = @divFloor(self.x, scalar);
+                            self.y = @divFloor(self.y, scalar);
+                            self.z = @divFloor(self.z, scalar);
+                        },
+                        .unsigned => {
+                            self.x /= scalar;
+                            self.y /= scalar;
+                            self.z /= scalar;
+                        },
+                    }
+                },
+                else => unreachable,
+            }
+        }
+
+        pub inline fn setNegate(self: *Vector3(T)) void {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    self.x = -self.x;
+                    self.y = -self.y;
+                    self.z = -self.z;
+                },
+                .int, .comptime_int => |int| {
+                    switch (int.signedness) {
+                        .signed => {
+                            self.x = -self.x;
+                            self.y = -self.y;
+                            self.z = -self.z;
+                        },
+                        .unsigned => {
+                            @compileError("Can't sign an unsigned integer. Was given " ++ @typeName(T) ++ " type");
+                        },
+                    }
+                },
+                else => unreachable,
+            }
+        }
+
+        pub inline fn setCross(self: *Vector3(T), other: Vector3(T)) void {
+            self.x = self.y * other.z - self.z * other.y;
+            self.y = self.z * other.x - self.x * other.z;
+            self.z = self.x * other.y - self.y * other.x;
+        }
+
+        pub inline fn setRotate(self: *Vector3(T), rot: quat.Quaternion(T)) void {
+            const qVec = Vector3(T){
+                .x = rot.fields[1],
+                .y = rot.fields[2],
+                .z = rot.fields[3],
+            };
+
+            const uv = cross(qVec, self.data);
+            const uuv = cross(qVec, uv);
+            self.setAdd(
+                Vector3(T).multiply(
+                    Vector3(T).add(
+                        Vector3(T).multiply(
+                            uv,
+                            .{
+                                .x = rot.fields[0],
+                                .y = rot.fields[0],
+                                .z = rot.fields[0],
+                            },
+                        ),
+                        uuv,
+                    ),
+                    .{ .x = 2.0, .y = 2.0, .z = 2.0 },
+                ),
+            );
+        }
+
+        pub inline fn setNormalize(self: *Vector3(T)) void {
+            const len: f32 = length(self.*);
+            if (len > 0.0) {
+                self.setSegment(len);
+            }
+        }
+
+        // NOTE: non set functions
+
+        pub inline fn Vector3To2(self: *const Vector3(T)) Vec2.Vector2(T) {
+            return Vec2.Vector2(T){
+                .x = self.x,
+                .y = self.y,
+            };
+        }
+
+        pub inline fn add(vec1: Vector3(T), vec2: Vector3(T)) Vector3(T) {
+            return Vector3(T){
+                .x = vec1.x + vec2.x,
+                .y = vec1.y + vec2.y,
+                .z = vec1.z + vec2.z,
+            };
+        }
+
+        pub inline fn subtract(vec1: Vector3(T), vec2: Vector3(T)) Vector3(T) {
+            return Vector3(T){
+                .x = vec1.x - vec2.x,
+                .y = vec1.y - vec2.y,
+                .z = vec1.z - vec2.z,
+            };
+        }
+
+        pub inline fn multiply(vec1: Vector3(T), vec2: Vector3(T)) Vector3(T) {
+            return Vector3(T){
+                .x = vec1.x * vec2.x,
+                .y = vec1.y * vec2.y,
+                .z = vec1.z * vec2.z,
+            };
+        }
+
+        pub inline fn divide(vec1: Vector3(T), vec2: Vector3(T)) Vector3(T) {
+            return Vector3(T){
+                .x = vec1.x / vec2.x,
+                .y = vec1.y / vec2.y,
+                .z = vec1.z / vec2.z,
+            };
+        }
+
+        pub inline fn scale(vec1: Vector3(T), scalar: f32) Vector3(T) {
+            return Vector3(T){
+                .x = vec1.x * scalar,
+                .y = vec1.y * scalar,
+                .z = vec1.z * scalar,
+            };
+        }
+
+        pub inline fn segment(vec1: Vector3(T), scalar: f32) Vector3(T) {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    return Vector3(T){
+                        .x = vec1.x / scalar,
+                        .y = vec1.y / scalar,
+                        .z = vec1.z / scalar,
+                    };
+                },
+                .int, .comptime_int => |int| {
+                    switch (int.signedness) {
+                        .signed => {
+                            return Vector3(T){
+                                .x = @divFloor(vec1.x, scalar),
+                                .y = @divFloor(vec1.y, scalar),
+                                .z = @divFloor(vec1.z, scalar),
+                            };
+                        },
+                        .unsigned => {
+                            return Vector3(T){
+                                .x = vec1.x / scalar,
+                                .y = vec1.y / scalar,
+                                .z = vec1.z / scalar,
+                            };
+                        },
+                    }
+                },
+                else => unreachable,
+            }
+        }
+
+        pub inline fn negate(vec1: Vector3(T)) Vector3(T) {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    return Vector3(T){
+                        .x = -vec1.x,
+                        .y = -vec1.y,
+                        .z = -vec1.z,
+                    };
+                },
+                .int, .comptime_int => |int| {
+                    switch (int.signedness) {
+                        .signed => {
+                            return Vector3(T){
+                                .x = -vec1.x,
+                                .y = -vec1.y,
+                                .z = -vec1.z,
+                            };
+                        },
+                        .unsigned => {
+                            @compileError("Can't sign an unsigned integer. Was given " ++ @typeName(T) ++ " type");
+                        },
+                    }
+                },
+                else => unreachable,
+            }
+        }
+
+        pub inline fn dot(vec1: Vector3(T), vec2: Vector3(T)) T {
+            return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+        }
+
+        pub inline fn cross(vec1: Vector3(T), vec2: Vector3(T)) Vector3(T) {
+            return Vector3(T){
+                .x = vec1.y * vec2.z - vec1.z * vec2.y,
+                .y = vec1.z * vec2.x - vec1.x * vec2.z,
+                .z = vec1.x * vec2.y - vec1.y * vec2.x,
+            };
+        }
+
+        pub inline fn rotate(vec1: Vector3(T), rot: quat.Quaternion(T)) Vector3(T) {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {},
+                else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type"),
+            }
+
+            const qVec = Vector3(T){
+                .x = rot.fields[1],
+                .y = rot.fields[2],
+                .z = rot.fields[3],
+            };
+
+            const uv = cross(qVec, vec1);
+            const uuv = cross(qVec, uv);
+            return vec1.add(
+                Vector3(T).multiply(
+                    Vector3(T).add(
+                        Vector3(T).multiply(
+                            uv,
+                            .{
+                                .x = rot.fields[0],
+                                .y = rot.fields[0],
+                                .z = rot.fields[0],
+                            },
+                        ),
+                        uuv,
+                    ),
+                    .{ .x = 2.0, .y = 2.0, .z = 2.0 },
+                ),
+            );
+        }
+
+        pub inline fn length(vec1: Vector3(T)) T {
+            return @sqrt(math.pow(T, vec1.x, 2) + math.pow(T, vec1.y, 2) + math.pow(T, vec1.z, 2));
+        }
+
+        pub inline fn distance(vec1: Vector3(T), vec2: Vector3(T)) f32 {
+            return @sqrt(math.pow(T, vec2.x - vec1.x, 2) + math.pow(T, vec2.y - vec1.y, 2) + math.pow(T, vec2.z - vec1.z, 2));
+        }
+
+        pub inline fn normalize(vec1: Vector3(T)) Vector3(T) {
+            const len: f32 = length(vec1);
+            std.debug.assert(len > 0);
+
+            return Vector3(T).segment(vec1, len);
+        }
+    };
+}

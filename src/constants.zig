@@ -36,14 +36,6 @@ pub const Matrix4 = struct {
     };
 };
 
-pub const Vec3 = struct {
-    pub const ZERO: Vector3 = .{ .x = 0.0, .y = 0.0, .z = 0.0 };
-    pub const ONE: Vector3 = .{ .x = 1.0, .y = 1.0, .z = 1.0 };
-    pub const UP: Vector3 = .{ .x = 0.0, .y = 1.0, .z = 0.0 };
-    pub const RIGHT: Vector3 = .{ .x = 1.0, .y = 0.0, .z = 0.0 };
-    pub const FORWARD: Vector3 = .{ .x = 0.0, .y = 0.0, .z = 1.0 };
-};
-
 pub const Vec2 = struct {
     pub const ZERO: Vector2 = .{ .x = 0.0, .y = 0.0 };
     pub const ONE: Vector2 = .{ .x = 1.0, .y = 1.0 };
