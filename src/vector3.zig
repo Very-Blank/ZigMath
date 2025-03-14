@@ -334,24 +334,58 @@ pub fn Vector3(comptime T: type) type {
             );
         }
 
-        // FIXME: If int return float with that many bits
-        // If comptime_int return comptime_float
-        pub inline fn length(vec1: Vector3(T)) T {
-            return @sqrt(math.pow(T, vec1.x, 2) + math.pow(T, vec1.y, 2) + math.pow(T, vec1.z, 2));
+        const returnType: type = switch (@typeInfo(T)) {
+            .float, .comptime_float => T,
+            .int => |int| @Type(.{ .float = .{ .bits = int.bits } }),
+            .comptime_int => comptime_float,
+            else => unreachable,
+        };
+
+        pub inline fn length(vec1: Vector3(T)) returnType {
+            switch (T) {
+                .float, .comptime_float => {
+                    return @sqrt(math.pow(returnType, vec1.x, 2) + math.pow(returnType, vec1.y, 2) + math.pow(returnType, vec1.z, 2));
+                },
+                .int, .comptime_int => {
+                    return @sqrt(math.pow(returnType, @as(returnType, @floatFromInt(vec1.x)), 2) + math.pow(returnType, @as(returnType, @floatFromInt(vec1.y)), 2) + math.pow(returnType, @as(returnType, @floatFromInt(vec1.z)), 2));
+                },
+                else => unreachable,
+            }
         }
 
-        // FIXME: If int return float with that many bits
-        // If comptime_int return comptime_float
-        pub inline fn distance(vec1: Vector3(T), vec2: Vector3(T)) f32 {
-            return @sqrt(math.pow(T, vec2.x - vec1.x, 2) + math.pow(T, vec2.y - vec1.y, 2) + math.pow(T, vec2.z - vec1.z, 2));
+        pub inline fn distance(vec1: Vector3(T), vec2: Vector3(T)) returnType {
+            switch (T) {
+                .float, .comptime_float => {
+                    return @sqrt(math.pow(returnType, vec2.x - vec1.x, 2) + math.pow(returnType, vec2.y - vec1.y, 2) + math.pow(returnType, vec2.z - vec1.z, 2));
+                },
+                .int, .comptime_int => {
+                    return @sqrt(math.pow(returnType, @as(returnType, @floatFromInt(vec2.x)) - @as(returnType, @floatFromInt(vec1.x)), 2) + math.pow(returnType, @as(returnType, @floatFromInt(vec2.y)) - @as(returnType, @floatFromInt(vec1.y)), 2) + math.pow(returnType, @as(returnType, @floatFromInt(vec2.z)) - @as(returnType, @floatFromInt(vec1.z)), 2));
+                },
+                else => unreachable,
+            }
         }
 
         // FIXME: Only for floats doesn't make sense with ints
-        pub inline fn normalize(vec1: Vector3(T)) Vector3(T) {
-            const len: f32 = length(vec1);
-            std.debug.assert(len > 0);
+        pub inline fn normalize(vec1: Vector3(T)) T {
+            switch (T) {
+                .float, .comptime_float => {
+                    const len: T = length(vec1);
+                    std.debug.assert(len > 0);
 
-            return Vector3(T).segment(vec1, len);
+                    return Vector3(T).segment(vec1, len);
+                },
+                // .int, .comptime_int => {
+                //     const len: T = length(vec1);
+                //     std.debug.assert(len > 0);
+                //
+                //     return Vector3(T).segment(vec1, len);
+                // },
+                // else => unreachable,
+            }
+            switch (T) {
+                .float, .comptime_float => {},
+                else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type"),
+            }
         }
     };
 }
