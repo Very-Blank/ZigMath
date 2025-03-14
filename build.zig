@@ -10,6 +10,14 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const panic_test = b.createModule(.{
+        .root_source_file = b.path("libs/ZigPanicErrorTester/src/comperrtest.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    main_mod.addImport("panictest", panic_test);
+
     const lib = b.addLibrary(.{
         .linkage = .static,
         .name = "ZigMath",

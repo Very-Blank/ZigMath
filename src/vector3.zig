@@ -40,12 +40,12 @@ pub fn Vector3(comptime T: type) type {
 
         pub inline fn setDivide(self: *Vector3(T), other: Vector3(T)) void {
             switch (@typeInfo(T)) {
-                .float, .comptime_float => {
+                .float, .comptime_int, .comptime_float => {
                     self.x /= other.x;
                     self.y /= other.y;
                     self.z /= other.z;
                 },
-                .int, .comptime_int => |int| {
+                .int => |int| {
                     switch (int.signedness) {
                         .signed => {
                             self.x = @divFloor(self.x, other.x);
@@ -71,12 +71,12 @@ pub fn Vector3(comptime T: type) type {
 
         pub inline fn setSegment(self: *Vector3(T), scalar: T) void {
             switch (@typeInfo(T)) {
-                .float, .comptime_float => {
+                .float, .comptime_int, .comptime_float => {
                     self.x /= scalar;
                     self.y /= scalar;
                     self.z /= scalar;
                 },
-                .int, .comptime_int => |int| {
+                .int => |int| {
                     switch (int.signedness) {
                         .signed => {
                             self.x = @divFloor(self.x, scalar);
@@ -96,12 +96,12 @@ pub fn Vector3(comptime T: type) type {
 
         pub inline fn setNegate(self: *Vector3(T)) void {
             switch (@typeInfo(T)) {
-                .float, .comptime_float => {
+                .float, .comptime_int, .comptime_float => {
                     self.x = -self.x;
                     self.y = -self.y;
                     self.z = -self.z;
                 },
-                .int, .comptime_int => |int| {
+                .int => |int| {
                     switch (int.signedness) {
                         .signed => {
                             self.x = -self.x;
@@ -123,6 +123,7 @@ pub fn Vector3(comptime T: type) type {
             self.z = self.x * other.y - self.y * other.x;
         }
 
+        // FIXME: Only for floats doesn't make sense with ints
         pub inline fn setRotate(self: *Vector3(T), rot: quat.Quaternion(T)) void {
             const qVec = Vector3(T){
                 .x = rot.fields[1],
@@ -150,6 +151,7 @@ pub fn Vector3(comptime T: type) type {
             );
         }
 
+        // FIXME: Only for floats doesn't make sense with ints
         pub inline fn setNormalize(self: *Vector3(T)) void {
             const len: f32 = length(self.*);
             if (len > 0.0) {
@@ -191,10 +193,33 @@ pub fn Vector3(comptime T: type) type {
         }
 
         pub inline fn divide(vec1: Vector3(T), vec2: Vector3(T)) Vector3(T) {
-            return Vector3(T){
-                .x = vec1.x / vec2.x,
-                .y = vec1.y / vec2.y,
-                .z = vec1.z / vec2.z,
+            return switch (@typeInfo(T)) {
+                .float, .comptime_int, .comptime_float => {
+                    return Vector3(T){
+                        .x = vec1.x / vec2.x,
+                        .y = vec1.y / vec2.y,
+                        .z = vec1.z / vec2.z,
+                    };
+                },
+                .int => |int| {
+                    switch (int.signedness) {
+                        .signed => {
+                            return Vector3(T){
+                                .x = @divFloor(vec1.x, vec2.x),
+                                .y = @divFloor(vec1.y, vec2.y),
+                                .z = @divFloor(vec1.z, vec2.z),
+                            };
+                        },
+                        .unsigned => {
+                            return Vector3(T){
+                                .x = vec1.x / vec2.x,
+                                .y = vec1.y / vec2.y,
+                                .z = vec1.z / vec2.z,
+                            };
+                        },
+                    }
+                },
+                else => unreachable,
             };
         }
 
@@ -207,25 +232,25 @@ pub fn Vector3(comptime T: type) type {
         }
 
         pub inline fn segment(vec1: Vector3(T), scalar: f32) Vector3(T) {
-            switch (@typeInfo(T)) {
-                .float, .comptime_float => {
-                    return Vector3(T){
+            return switch (@typeInfo(T)) {
+                .float, .comptime_int, .comptime_float => {
+                    Vector3(T){
                         .x = vec1.x / scalar,
                         .y = vec1.y / scalar,
                         .z = vec1.z / scalar,
                     };
                 },
-                .int, .comptime_int => |int| {
+                .int => |int| {
                     switch (int.signedness) {
                         .signed => {
-                            return Vector3(T){
+                            Vector3(T){
                                 .x = @divFloor(vec1.x, scalar),
                                 .y = @divFloor(vec1.y, scalar),
                                 .z = @divFloor(vec1.z, scalar),
                             };
                         },
                         .unsigned => {
-                            return Vector3(T){
+                            Vector3(T){
                                 .x = vec1.x / scalar,
                                 .y = vec1.y / scalar,
                                 .z = vec1.z / scalar,
@@ -234,22 +259,22 @@ pub fn Vector3(comptime T: type) type {
                     }
                 },
                 else => unreachable,
-            }
+            };
         }
 
         pub inline fn negate(vec1: Vector3(T)) Vector3(T) {
-            switch (@typeInfo(T)) {
-                .float, .comptime_float => {
-                    return Vector3(T){
+            return switch (@typeInfo(T)) {
+                .float, .comptime_int, .comptime_float => {
+                    Vector3(T){
                         .x = -vec1.x,
                         .y = -vec1.y,
                         .z = -vec1.z,
                     };
                 },
-                .int, .comptime_int => |int| {
+                .int => |int| {
                     switch (int.signedness) {
                         .signed => {
-                            return Vector3(T){
+                            Vector3(T){
                                 .x = -vec1.x,
                                 .y = -vec1.y,
                                 .z = -vec1.z,
@@ -261,9 +286,10 @@ pub fn Vector3(comptime T: type) type {
                     }
                 },
                 else => unreachable,
-            }
+            };
         }
 
+        // FIXME: Only for floats doesn't make sense with ints
         pub inline fn dot(vec1: Vector3(T), vec2: Vector3(T)) T {
             return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
         }
@@ -308,14 +334,19 @@ pub fn Vector3(comptime T: type) type {
             );
         }
 
+        // FIXME: If int return float with that many bits
+        // If comptime_int return comptime_float
         pub inline fn length(vec1: Vector3(T)) T {
             return @sqrt(math.pow(T, vec1.x, 2) + math.pow(T, vec1.y, 2) + math.pow(T, vec1.z, 2));
         }
 
+        // FIXME: If int return float with that many bits
+        // If comptime_int return comptime_float
         pub inline fn distance(vec1: Vector3(T), vec2: Vector3(T)) f32 {
             return @sqrt(math.pow(T, vec2.x - vec1.x, 2) + math.pow(T, vec2.y - vec1.y, 2) + math.pow(T, vec2.z - vec1.z, 2));
         }
 
+        // FIXME: Only for floats doesn't make sense with ints
         pub inline fn normalize(vec1: Vector3(T)) Vector3(T) {
             const len: f32 = length(vec1);
             std.debug.assert(len > 0);
