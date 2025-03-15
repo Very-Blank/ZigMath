@@ -1,12 +1,12 @@
 const std = @import("std");
 const quat = @import("quaternion.zig");
-const math = std.math;
+const math = @import("mathHelper.zig");
 const Vec2 = @import("vector2.zig");
 
 pub fn Vector3(comptime T: type) type {
     switch (@typeInfo(T)) {
         .int, .float, .comptime_int, .comptime_float => {},
-        else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type"),
+        else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type."),
     }
 
     return struct {
@@ -109,7 +109,7 @@ pub fn Vector3(comptime T: type) type {
                             self.z = -self.z;
                         },
                         .unsigned => {
-                            @compileError("Can't sign an unsigned integer. Was given " ++ @typeName(T) ++ " type");
+                            @compileError("Can't sign an unsigned integer. Was given " ++ @typeName(T) ++ " type.");
                         },
                     }
                 },
@@ -153,9 +153,14 @@ pub fn Vector3(comptime T: type) type {
 
         // FIXME: Only for floats doesn't make sense with ints
         pub inline fn setNormalize(self: *Vector3(T)) void {
-            const len: f32 = length(self.*);
-            if (len > 0.0) {
-                self.setSegment(len);
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    const len: T = self.length();
+                    std.debug.assert(len > 0);
+
+                    self.setSegment(len);
+                },
+                else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type."),
             }
         }
 
@@ -193,7 +198,7 @@ pub fn Vector3(comptime T: type) type {
         }
 
         pub inline fn divide(vec1: Vector3(T), vec2: Vector3(T)) Vector3(T) {
-            return switch (@typeInfo(T)) {
+            switch (@typeInfo(T)) {
                 .float, .comptime_int, .comptime_float => {
                     return Vector3(T){
                         .x = vec1.x / vec2.x,
@@ -220,10 +225,10 @@ pub fn Vector3(comptime T: type) type {
                     }
                 },
                 else => unreachable,
-            };
+            }
         }
 
-        pub inline fn scale(vec1: Vector3(T), scalar: f32) Vector3(T) {
+        pub inline fn scale(vec1: Vector3(T), scalar: T) Vector3(T) {
             return Vector3(T){
                 .x = vec1.x * scalar,
                 .y = vec1.y * scalar,
@@ -231,10 +236,10 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub inline fn segment(vec1: Vector3(T), scalar: f32) Vector3(T) {
-            return switch (@typeInfo(T)) {
+        pub inline fn segment(vec1: Vector3(T), scalar: T) Vector3(T) {
+            switch (@typeInfo(T)) {
                 .float, .comptime_int, .comptime_float => {
-                    Vector3(T){
+                    return Vector3(T){
                         .x = vec1.x / scalar,
                         .y = vec1.y / scalar,
                         .z = vec1.z / scalar,
@@ -243,14 +248,14 @@ pub fn Vector3(comptime T: type) type {
                 .int => |int| {
                     switch (int.signedness) {
                         .signed => {
-                            Vector3(T){
+                            return Vector3(T){
                                 .x = @divFloor(vec1.x, scalar),
                                 .y = @divFloor(vec1.y, scalar),
                                 .z = @divFloor(vec1.z, scalar),
                             };
                         },
                         .unsigned => {
-                            Vector3(T){
+                            return Vector3(T){
                                 .x = vec1.x / scalar,
                                 .y = vec1.y / scalar,
                                 .z = vec1.z / scalar,
@@ -259,13 +264,13 @@ pub fn Vector3(comptime T: type) type {
                     }
                 },
                 else => unreachable,
-            };
+            }
         }
 
         pub inline fn negate(vec1: Vector3(T)) Vector3(T) {
-            return switch (@typeInfo(T)) {
+            switch (@typeInfo(T)) {
                 .float, .comptime_int, .comptime_float => {
-                    Vector3(T){
+                    return Vector3(T){
                         .x = -vec1.x,
                         .y = -vec1.y,
                         .z = -vec1.z,
@@ -274,23 +279,29 @@ pub fn Vector3(comptime T: type) type {
                 .int => |int| {
                     switch (int.signedness) {
                         .signed => {
-                            Vector3(T){
+                            return Vector3(T){
                                 .x = -vec1.x,
                                 .y = -vec1.y,
                                 .z = -vec1.z,
                             };
                         },
                         .unsigned => {
-                            @compileError("Can't sign an unsigned integer. Was given " ++ @typeName(T) ++ " type");
+                            @compileError("Can't sign an unsigned integer. Was given " ++ @typeName(T) ++ " type.");
                         },
                     }
                 },
                 else => unreachable,
-            };
+            }
         }
 
-        // FIXME: Only for floats doesn't make sense with ints
         pub inline fn dot(vec1: Vector3(T), vec2: Vector3(T)) T {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {},
+                else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type."),
+            }
+
+            std.debug.assert(length(vec1) == 1.0);
+
             return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
         }
 
@@ -305,7 +316,7 @@ pub fn Vector3(comptime T: type) type {
         pub inline fn rotate(vec1: Vector3(T), rot: quat.Quaternion(T)) Vector3(T) {
             switch (@typeInfo(T)) {
                 .float, .comptime_float => {},
-                else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type"),
+                else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type."),
             }
 
             const qVec = Vector3(T){
@@ -342,49 +353,51 @@ pub fn Vector3(comptime T: type) type {
         };
 
         pub inline fn length(vec1: Vector3(T)) returnType {
-            switch (T) {
+            switch (@typeInfo(T)) {
                 .float, .comptime_float => {
-                    return @sqrt(math.pow(returnType, vec1.x, 2) + math.pow(returnType, vec1.y, 2) + math.pow(returnType, vec1.z, 2));
+                    return @sqrt(math.pow2(returnType, vec1.x) + math.pow2(returnType, vec1.y) + math.pow2(returnType, vec1.z));
                 },
                 .int, .comptime_int => {
-                    return @sqrt(math.pow(returnType, @as(returnType, @floatFromInt(vec1.x)), 2) + math.pow(returnType, @as(returnType, @floatFromInt(vec1.y)), 2) + math.pow(returnType, @as(returnType, @floatFromInt(vec1.z)), 2));
+                    return @sqrt(math.pow2(returnType, @as(returnType, @floatFromInt(vec1.x))) + math.pow2(returnType, @as(returnType, @floatFromInt(vec1.y))) + math.pow2(returnType, @as(returnType, @floatFromInt(vec1.z))));
                 },
                 else => unreachable,
             }
         }
 
         pub inline fn distance(vec1: Vector3(T), vec2: Vector3(T)) returnType {
-            switch (T) {
+            switch (@typeInfo(T)) {
                 .float, .comptime_float => {
-                    return @sqrt(math.pow(returnType, vec2.x - vec1.x, 2) + math.pow(returnType, vec2.y - vec1.y, 2) + math.pow(returnType, vec2.z - vec1.z, 2));
+                    return @sqrt(math.pow2(returnType, vec2.x - vec1.x) + math.pow2(returnType, vec2.y - vec1.y) + math.pow2(returnType, vec2.z - vec1.z));
                 },
                 .int, .comptime_int => {
-                    return @sqrt(math.pow(returnType, @as(returnType, @floatFromInt(vec2.x)) - @as(returnType, @floatFromInt(vec1.x)), 2) + math.pow(returnType, @as(returnType, @floatFromInt(vec2.y)) - @as(returnType, @floatFromInt(vec1.y)), 2) + math.pow(returnType, @as(returnType, @floatFromInt(vec2.z)) - @as(returnType, @floatFromInt(vec1.z)), 2));
+                    return @sqrt(math.pow2(returnType, @as(returnType, @floatFromInt(vec2.x)) - @as(returnType, @floatFromInt(vec1.x))) + math.pow2(returnType, @as(returnType, @floatFromInt(vec2.y)) - @as(returnType, @floatFromInt(vec1.y))) + math.pow2(returnType, @as(returnType, @floatFromInt(vec2.z)) - @as(returnType, @floatFromInt(vec1.z))));
                 },
                 else => unreachable,
             }
         }
 
         // FIXME: Only for floats doesn't make sense with ints
-        pub inline fn normalize(vec1: Vector3(T)) T {
-            switch (T) {
+        pub inline fn normalize(vec1: Vector3(T)) Vector3(returnType) {
+            switch (@typeInfo(T)) {
                 .float, .comptime_float => {
                     const len: T = length(vec1);
                     std.debug.assert(len > 0);
 
-                    return Vector3(T).segment(vec1, len);
+                    return vec1.segment(len);
                 },
-                // .int, .comptime_int => {
-                //     const len: T = length(vec1);
-                //     std.debug.assert(len > 0);
-                //
-                //     return Vector3(T).segment(vec1, len);
-                // },
-                // else => unreachable,
-            }
-            switch (T) {
-                .float, .comptime_float => {},
-                else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type"),
+                .int, .comptime_int => {
+                    const newVec: Vector3(returnType) = .{
+                        .x = @floatFromInt(vec1.x),
+                        .y = @floatFromInt(vec1.y),
+                        .z = @floatFromInt(vec1.z),
+                    };
+
+                    const len: returnType = newVec.length();
+                    std.debug.assert(len > 0);
+
+                    return newVec.segment(len);
+                },
+                else => unreachable,
             }
         }
     };
