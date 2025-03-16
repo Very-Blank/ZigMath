@@ -300,7 +300,25 @@ pub fn Vector3(comptime T: type) type {
                 else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type."),
             }
 
-            std.debug.assert(length(vec1) == 1.0);
+            switch (T) {
+                f16 => {
+                    std.debug.assert(@abs(vec1.length() - 1.0) < 1e-3);
+                    std.debug.assert(@abs(vec2.length() - 1.0) < 1e-3);
+                },
+                f32, comptime_float => {
+                    std.debug.assert(@abs(vec1.length() - 1.0) < 1e-6);
+                    std.debug.assert(@abs(vec2.length() - 1.0) < 1e-6);
+                },
+                f64 => {
+                    std.debug.assert(@abs(vec1.length() - 1.0) < 1e-12);
+                    std.debug.assert(@abs(vec2.length() - 1.0) < 1e-12);
+                },
+                f128 => {
+                    std.debug.assert(@abs(vec1.length() - 1.0) < 1e-24);
+                    std.debug.assert(@abs(vec2.length() - 1.0) < 1e-24);
+                },
+                else => unreachable,
+            }
 
             return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
         }
@@ -376,12 +394,26 @@ pub fn Vector3(comptime T: type) type {
             }
         }
 
-        // FIXME: Only for floats doesn't make sense with ints
         pub inline fn normalize(vec1: Vector3(T)) Vector3(returnType) {
             switch (@typeInfo(T)) {
                 .float, .comptime_float => {
                     const len: T = length(vec1);
-                    std.debug.assert(len > 0);
+
+                    switch (T) {
+                        f16 => {
+                            std.debug.assert(len > 1e-3);
+                        },
+                        f32, comptime_float => {
+                            std.debug.assert(len > 1e-6);
+                        },
+                        f64 => {
+                            std.debug.assert(len > 1e-12);
+                        },
+                        f128 => {
+                            std.debug.assert(len > 1e-24);
+                        },
+                        else => unreachable,
+                    }
 
                     return vec1.segment(len);
                 },
@@ -393,7 +425,21 @@ pub fn Vector3(comptime T: type) type {
                     };
 
                     const len: returnType = newVec.length();
-                    std.debug.assert(len > 0);
+                    switch (returnType) {
+                        f16 => {
+                            std.debug.assert(len > 1e-3);
+                        },
+                        f32, comptime_float => {
+                            std.debug.assert(len > 1e-6);
+                        },
+                        f64 => {
+                            std.debug.assert(len > 1e-12);
+                        },
+                        f128 => {
+                            std.debug.assert(len > 1e-24);
+                        },
+                        else => unreachable,
+                    }
 
                     return newVec.segment(len);
                 },

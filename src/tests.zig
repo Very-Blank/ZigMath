@@ -404,6 +404,60 @@ test "Vector3 negate" {
     }
 }
 
+test "Vector3 dot" {
+    {
+        var vec1: zigmath.Vec3.Vector3(f32) = .{ .x = 2, .y = 3, .z = -5 };
+        vec1.setNormalize();
+
+        var vec2: zigmath.Vec3.Vector3(f32) = .{ .x = 34, .y = 10, .z = 9 };
+        vec2.setNormalize();
+
+        try std.testing.expectApproxEqRel(0.235, vec1.dot(vec2), 0.1);
+    }
+
+    {
+        try panictest.expectCompileError(
+            \\ const zigmath = @import("src/zigmath.zig");
+            \\ test "This should panic" {
+            \\        const vec1: zigmath.Vec3.Vector3(u32) = .{ .x = 2, .y = 3, .z = 5 };
+            \\        const vec2: zigmath.Vec3.Vector3(u32) = .{ .x = 34, .y = 10, .z = 9 };
+            \\        try std.testing.expectApproxEqRel(0.235, vec1.dot(vec2), 0.1);
+            \\ }
+        );
+    }
+
+    {
+        try panictest.expectCompileError(
+            \\ const zigmath = @import("src/zigmath.zig");
+            \\ test "This should panic" {
+            \\        const vec1: zigmath.Vec3.Vector3(i32) = .{ .x = 2, .y = 3, .z = -5 };
+            \\        const vec2: zigmath.Vec3.Vector3(i32) = .{ .x = 34, .y = 10, .z = 9 };
+            \\        try std.testing.expectApproxEqRel(0.235, vec1.dot(vec2), 0.1);
+            \\ }
+        );
+    }
+
+    {
+        comptime var vec1: zigmath.Vec3.Vector3(comptime_float) = .{ .x = 2, .y = 3, .z = -5 };
+
+        try std.testing.expectEqual(zigmath.Vec3.Vector3(comptime_float){ .x = -2, .y = -3, .z = 5 }, vec1.negate());
+        try std.testing.expectEqual(zigmath.Vec3.Vector3(comptime_float){ .x = 2, .y = 3, .z = -5 }, vec1);
+        vec1.setNegate();
+        try std.testing.expectEqual(zigmath.Vec3.Vector3(comptime_float){ .x = -2, .y = -3, .z = 5 }, vec1);
+    }
+
+    {
+        try panictest.expectCompileError(
+            \\ const zigmath = @import("src/zigmath.zig");
+            \\ test "This should panic" {
+            \\        const vec1: zigmath.Vec3.Vector3(comptime_int) = .{ .x = 2, .y = 3, .z = -5 };
+            \\        const vec2: zigmath.Vec3.Vector3(comptime_int) = .{ .x = 34, .y = 10, .z = 9 };
+            \\        try std.testing.expectApproxEqRel(0.235, vec1.dot(vec2), 0.1);
+            \\ }
+        );
+    }
+}
+
 test "Vector3 length" {
     {
         const vec1: zigmath.Vec3.Vector3(f32) = .{ .x = 3, .y = 2, .z = 6 };
