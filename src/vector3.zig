@@ -324,6 +324,15 @@ pub fn Vector3(comptime T: type) type {
         }
 
         pub inline fn cross(vec1: Vector3(T), vec2: Vector3(T)) Vector3(T) {
+            switch (@typeInfo(T)) {
+                .int => |int| {
+                    switch (int.signedness) {
+                        .signed => {},
+                        .unsigned => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type."),
+                    }
+                },
+                else => {},
+            }
             return Vector3(T){
                 .x = vec1.y * vec2.z - vec1.z * vec2.y,
                 .y = vec1.z * vec2.x - vec1.x * vec2.z,

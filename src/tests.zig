@@ -458,6 +458,47 @@ test "Vector3 dot" {
     }
 }
 
+test "Vector3 cross" {
+    {
+        const vec1: zigmath.Vec3.Vector3(f32) = .{ .x = 2, .y = 3, .z = 4 };
+        const vec2: zigmath.Vec3.Vector3(f32) = .{ .x = 5, .y = 6, .z = 7 };
+
+        try std.testing.expectEqual(zigmath.Vec3.Vector3(f32){ .x = -3, .y = 6, .z = -3 }, vec1.cross(vec2));
+    }
+
+    {
+        const vec1: zigmath.Vec3.Vector3(i32) = .{ .x = 2, .y = 3, .z = 4 };
+        const vec2: zigmath.Vec3.Vector3(i32) = .{ .x = 5, .y = 6, .z = 7 };
+
+        try std.testing.expectEqual(zigmath.Vec3.Vector3(i32){ .x = -3, .y = 6, .z = -3 }, vec1.cross(vec2));
+    }
+
+    {
+        try panictest.expectCompileError(
+            \\ const zigmath = @import("src/zigmath.zig");
+            \\ test "This should panic" {
+            \\        const vec1: zigmath.Vec3.Vector3(u32) = .{ .x = 2, .y = 3, .z = 4 };
+            \\        const vec2: zigmath.Vec3.Vector3(u32) = .{ .x = 5, .y = 6, .z = 7 };
+            \\        const vec1.cross(vec2);
+            \\ }
+        );
+    }
+
+    {
+        const vec1: zigmath.Vec3.Vector3(comptime_int) = .{ .x = 2, .y = 3, .z = 4 };
+        const vec2: zigmath.Vec3.Vector3(comptime_int) = .{ .x = 5, .y = 6, .z = 7 };
+
+        try std.testing.expectEqual(zigmath.Vec3.Vector3(comptime_int){ .x = -3, .y = 6, .z = -3 }, vec1.cross(vec2));
+    }
+
+    {
+        const vec1: zigmath.Vec3.Vector3(comptime_float) = .{ .x = 2, .y = 3, .z = 4 };
+        const vec2: zigmath.Vec3.Vector3(comptime_float) = .{ .x = 5, .y = 6, .z = 7 };
+
+        try std.testing.expectEqual(zigmath.Vec3.Vector3(comptime_float){ .x = -3, .y = 6, .z = -3 }, vec1.cross(vec2));
+    }
+}
+
 test "Vector3 length" {
     {
         const vec1: zigmath.Vec3.Vector3(f32) = .{ .x = 3, .y = 2, .z = 6 };
