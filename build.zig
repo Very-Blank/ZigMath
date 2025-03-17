@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
 
     // tests
     const testMod = b.createModule(.{
-        .root_source_file = b.path("src/tests.zig"),
+        .root_source_file = b.path("src/testVector3.zig"),
         .target = target,
         .optimize = optimize,
     });
