@@ -1,3 +1,0 @@
-[submodule "libs/ZigPanicErrorTester"]
-	path = libs/ZigPanicErrorTester
-	url = git@github.com:Very-Blank/ZigPanicErrorTester.git

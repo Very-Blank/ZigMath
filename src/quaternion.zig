@@ -10,6 +10,8 @@ pub fn Quaternion(comptime T: type) type {
     return struct {
         fields: @Vector(4, T),
 
+        pub const IDENTITY: Quaternion = .{ .fields = @Vector(4, f32){ 1, 0, 0, 0 } };
+
         pub fn setFromAngle(radians: T, axis: constants.Axis) void {
             switch (axis) {
                 .x => {

@@ -7,58 +7,17 @@ pub fn Vector2(comptime T: type) type {
         x: T,
         y: T,
 
-        pub const up = .{ .x = 0, .y = 1 };
-        pub const right = .{ .x = 1, .y = 0 };
-        pub const one = .{ .x = 1, .y = 1 };
-        pub const zero = .{ .x = 0, .y = 0 };
-
         const Self = @This();
 
-        pub inline fn setAdd(self: *Self, other: Self) void {
-            self.x += other.x;
-            self.y += other.y;
-        }
+        pub const up = Self{ .x = 0, .y = 1 };
+        pub const right = Self{ .x = 1, .y = 0 };
+        pub const one = Self{ .x = 1, .y = 1 };
+        pub const zero = Self{ .x = 0, .y = 0 };
 
-        pub inline fn setSubtract(self: *Self, other: Self) void {
-            self.x -= other.x;
-            self.y -= other.y;
-        }
-
-        pub inline fn setMultiply(self: *Self, other: Self) void {
-            self.x *= other.x;
-            self.y *= other.y;
-        }
-
-        pub inline fn setDivide(self: *Self, other: Self) void {
-            self.x /= other.x;
-            self.y /= other.y;
-        }
-
-        pub inline fn setScale(self: *Self, scalar: f32) void {
-            self.x *= scalar;
-            self.y *= scalar;
-        }
-
-        pub inline fn setSegment(self: *Self, scalar: f32) void {
-            self.x /= scalar;
-            self.y /= scalar;
-        }
-
-        pub inline fn setNegate(self: *Self) void {
-            self.x = -self.x;
-            self.y = -self.y;
-        }
-
-        pub inline fn setNormalize(self: *Self) void {
-            self.setSegment(length(self.*));
-        }
-
-        // NOTE: non set functions
-
-        pub inline fn vector2To3(self: *const Self) Vector3 {
+        pub inline fn vector2To3(vec1: Self) Vector3 {
             return .{
-                .x = self.x,
-                .y = self.y,
+                .x = vec1.x,
+                .y = vec1.y,
                 .z = 0.0,
             };
         }
