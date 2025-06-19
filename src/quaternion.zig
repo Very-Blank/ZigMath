@@ -1,5 +1,6 @@
-const constants = @import("constants.zig");
 const Vector3 = @import("vector3.zig").Vector3;
+
+pub const Axis = enum { x, y, z };
 
 pub fn Quaternion(comptime T: type) type {
     switch (@typeInfo(T)) {
@@ -12,7 +13,7 @@ pub fn Quaternion(comptime T: type) type {
 
         pub const IDENTITY: Quaternion = .{ .fields = @Vector(4, f32){ 1, 0, 0, 0 } };
 
-        pub fn setFromAngle(radians: T, axis: constants.Axis) void {
+        pub fn setFromAngle(radians: T, axis: Axis) void {
             switch (axis) {
                 .x => {
                     return .{
@@ -34,7 +35,7 @@ pub fn Quaternion(comptime T: type) type {
 
         // Uses x, y, z order
         pub fn setFromVector(self: *Quaternion(T), vector: Vector3) void {
-            self.setMultiply(multiply(createFromRadians(vector.x, constants.Axis.x), createFromRadians(vector.y, constants.Axis.y)), createFromRadians(vector.z, constants.Axis.z));
+            self.setMultiply(multiply(createFromRadians(vector.x, Axis.x), createFromRadians(vector.y, Axis.y)), createFromRadians(vector.z, Axis.z));
         }
 
         // Hamilton product
@@ -47,7 +48,7 @@ pub fn Quaternion(comptime T: type) type {
             };
         }
 
-        pub fn createFromRadians(radians: T, axis: constants.Axis) Quaternion(T) {
+        pub fn createFromRadians(radians: T, axis: Axis) Quaternion(T) {
             switch (axis) {
                 .x => {
                     return .{
@@ -69,7 +70,7 @@ pub fn Quaternion(comptime T: type) type {
 
         // Uses x, y, z order
         pub fn createFromVector(vector: Vector3) Quaternion(T) {
-            return multiply(multiply(createFromRadians(vector.x, constants.Axis.x), createFromRadians(vector.y, constants.Axis.y)), createFromRadians(vector.z, constants.Axis.z));
+            return multiply(multiply(createFromRadians(vector.x, Axis.x), createFromRadians(vector.y, Axis.y)), createFromRadians(vector.z, Axis.z));
         }
 
         // Hamilton product
