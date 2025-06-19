@@ -14,7 +14,7 @@ pub fn Vector2(comptime T: type) type {
         pub const one: Self = .{ .x = 1, .y = 1 };
         pub const zero: Self = .{ .x = 0, .y = 0 };
 
-        pub inline fn vector2To3(vec1: Self) Vector3 {
+        pub inline fn vector2To3(vec1: Self) Vector3(T) {
             return .{
                 .x = vec1.x,
                 .y = vec1.y,
