@@ -9,10 +9,10 @@ pub fn Vector2(comptime T: type) type {
 
         const Self = @This();
 
-        pub const up = Self{ .x = 0, .y = 1 };
-        pub const right = Self{ .x = 1, .y = 0 };
-        pub const one = Self{ .x = 1, .y = 1 };
-        pub const zero = Self{ .x = 0, .y = 0 };
+        pub const up: Self = .{ .x = 0, .y = 1 };
+        pub const right: Self = .{ .x = 1, .y = 0 };
+        pub const one: Self = .{ .x = 1, .y = 1 };
+        pub const zero: Self = .{ .x = 0, .y = 0 };
 
         pub inline fn vector2To3(vec1: Self) Vector3 {
             return .{
