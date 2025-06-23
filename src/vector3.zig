@@ -55,6 +55,40 @@ pub fn Vector3(comptime T: type) type {
 
         pub inline fn divide(vec1: Self, vec2: Self) Self {
             switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    switch (T) {
+                        f16 => {
+                            std.debug.assert(vec2.x > 1e-3);
+                            std.debug.assert(vec2.y > 1e-3);
+                            std.debug.assert(vec2.z > 1e-3);
+                        },
+                        f32, comptime_float => {
+                            std.debug.assert(vec2.x > 1e-6);
+                            std.debug.assert(vec2.y > 1e-6);
+                            std.debug.assert(vec2.z > 1e-6);
+                        },
+                        f64 => {
+                            std.debug.assert(vec2.x > 1e-12);
+                            std.debug.assert(vec2.y > 1e-12);
+                            std.debug.assert(vec2.z > 1e-12);
+                        },
+                        f128 => {
+                            std.debug.assert(vec2.x > 1e-24);
+                            std.debug.assert(vec2.y > 1e-24);
+                            std.debug.assert(vec2.z > 1e-24);
+                        },
+                        else => unreachable,
+                    }
+                },
+                .int, .comptime_int => {
+                    std.debug.assert(vec2.x != 0);
+                    std.debug.assert(vec2.y != 0);
+                    std.debug.assert(vec2.z != 0);
+                },
+                else => unreachable,
+            }
+
+            switch (@typeInfo(T)) {
                 .float, .comptime_int, .comptime_float => {
                     return Self{
                         .x = vec1.x / vec2.x,
@@ -93,6 +127,30 @@ pub fn Vector3(comptime T: type) type {
         }
 
         pub inline fn segment(vec1: Self, scalar: T) Self {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    switch (T) {
+                        f16 => {
+                            std.debug.assert(scalar > 1e-3);
+                        },
+                        f32, comptime_float => {
+                            std.debug.assert(scalar > 1e-6);
+                        },
+                        f64 => {
+                            std.debug.assert(scalar > 1e-12);
+                        },
+                        f128 => {
+                            std.debug.assert(scalar > 1e-24);
+                        },
+                        else => unreachable,
+                    }
+                },
+                .int, .comptime_int => {
+                    std.debug.assert(scalar != 0);
+                },
+                else => unreachable,
+            }
+
             switch (@typeInfo(T)) {
                 .float, .comptime_int, .comptime_float => {
                     return Self{

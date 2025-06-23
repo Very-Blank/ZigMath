@@ -3,6 +3,11 @@ const math = std.math;
 const Vector3 = @import("vector3.zig").Vector3;
 
 pub fn Vector2(comptime T: type) type {
+    switch (@typeInfo(T)) {
+        .float, .comptime_float => {},
+        else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type."),
+    }
+
     return struct {
         x: T,
         y: T,
@@ -44,20 +49,66 @@ pub fn Vector2(comptime T: type) type {
         }
 
         pub inline fn divide(vec1: Self, vec2: Self) Self {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    switch (T) {
+                        f16 => {
+                            std.debug.assert(vec2.x > 1e-3);
+                            std.debug.assert(vec2.y > 1e-3);
+                        },
+                        f32, comptime_float => {
+                            std.debug.assert(vec2.x > 1e-6);
+                            std.debug.assert(vec2.y > 1e-6);
+                        },
+                        f64 => {
+                            std.debug.assert(vec2.x > 1e-12);
+                            std.debug.assert(vec2.y > 1e-12);
+                        },
+                        f128 => {
+                            std.debug.assert(vec2.x > 1e-24);
+                            std.debug.assert(vec2.y > 1e-24);
+                        },
+                        else => unreachable,
+                    }
+                },
+                else => unreachable,
+            }
+
             return Self{
                 .x = vec1.x / vec2.x,
                 .y = vec1.y / vec2.y,
             };
         }
 
-        pub inline fn scale(vec1: Self, scalar: f32) Self {
+        pub inline fn scale(vec1: Self, scalar: T) Self {
             return Self{
                 .x = vec1.x * scalar,
                 .y = vec1.y * scalar,
             };
         }
 
-        pub inline fn segment(vec1: Self, scalar: f32) Self {
+        pub inline fn segment(vec1: Self, scalar: T) Self {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    switch (T) {
+                        f16 => {
+                            std.debug.assert(scalar > 1e-3);
+                        },
+                        f32, comptime_float => {
+                            std.debug.assert(scalar > 1e-6);
+                        },
+                        f64 => {
+                            std.debug.assert(scalar > 1e-12);
+                        },
+                        f128 => {
+                            std.debug.assert(scalar > 1e-24);
+                        },
+                        else => unreachable,
+                    }
+                },
+                else => unreachable,
+            }
+
             return Self{
                 .x = vec1.x / scalar,
                 .y = vec1.y / scalar,
@@ -84,6 +135,27 @@ pub fn Vector2(comptime T: type) type {
         }
 
         pub inline fn normalize(vec1: Self) Self {
+            switch (@typeInfo(T)) {
+                .float, .comptime_float => {
+                    switch (T) {
+                        f16 => {
+                            std.debug.assert(length(vec1) > 1e-3);
+                        },
+                        f32, comptime_float => {
+                            std.debug.assert(length(vec1) > 1e-6);
+                        },
+                        f64 => {
+                            std.debug.assert(length(vec1) > 1e-12);
+                        },
+                        f128 => {
+                            std.debug.assert(length(vec1) > 1e-24);
+                        },
+                        else => unreachable,
+                    }
+                },
+                else => unreachable,
+            }
+
             return Self.segment(vec1, length(vec1));
         }
     };
