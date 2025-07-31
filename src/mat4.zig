@@ -118,16 +118,18 @@ pub fn Mat4(comptime T: type) type {
         }
 
         pub fn inverse(self: Self) Self {
+            var result = self;
+
             const det = determinant(self);
             std.debug.assert(det != 0);
 
             for (0..4) |i| {
                 for (0..4) |j| {
-                    self.fields[i][j] /= det;
+                    result.fields[i][j] /= det;
                 }
             }
 
-            return self;
+            return result;
         }
 
         pub fn determinant(self: Self) T {
