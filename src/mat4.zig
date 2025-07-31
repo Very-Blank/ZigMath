@@ -53,8 +53,8 @@ pub fn Mat4(comptime T: type) type {
             };
         }
 
-        pub fn multiplyVector(mat: Self, vec: T[4]) T[4] {
-            var result: T[4] = .{ 0, 0, 0, 0 };
+        pub fn multiplyVector(mat: Self, vec: [4]T) [4]T {
+            var result: [4]T = .{ 0, 0, 0, 0 };
 
             for (0..4) |i| {
                 for (0..4) |j| {
