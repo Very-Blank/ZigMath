@@ -53,6 +53,18 @@ pub fn Mat4(comptime T: type) type {
             };
         }
 
+        pub fn multiplyVector(mat: Self, vec: T[4]) T[4] {
+            var result: T[4] = .{ 0, 0, 0, 0 };
+
+            for (0..4) |i| {
+                for (0..4) |j| {
+                    result[i] += mat.fields[j][i] * vec[j];
+                }
+            }
+
+            return result;
+        }
+
         pub fn perspective(fov: T, aspect: T, near: T, far: T) Self {
             std.debug.assert(@abs(aspect - 0.001) > 0);
             return .{
