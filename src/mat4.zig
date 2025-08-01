@@ -115,18 +115,123 @@ pub fn Mat4(comptime T: type) type {
             };
         }
 
-        // FIXME: Incorrect use cofactor and divide that with the determinant.
         pub fn inverse(self: Self) Self {
-            var result = self;
-
-            const det = determinant(self);
+            const det = self.determinant();
             std.debug.assert(det != 0);
 
-            for (0..4) |i| {
-                for (0..4) |j| {
-                    result.fields[i][j] /= det;
-                }
-            }
+            var result: Self = undefined;
+
+            // for x in range(4):
+            //     for y in range(4):
+            //         if(x % 2 == 0):
+            //             if(y % 2 == 0):
+            //                 print(f"result.fields[{y}][{x}] = det3x3([3]@Vector(3, T){{")
+            //             else:
+            //                 print(f"result.fields[{y}][{x}] = -det3x3([3]@Vector(3, T){{")
+            //         else:
+            //             if(y % 2 != 0):
+            //                 print(f"result.fields[{y}][{x}] = det3x3([3]@Vector(3, T){{")
+            //             else:
+            //                 print(f"result.fields[{y}][{x}] = -det3x3([3]@Vector(3, T){{")
+            //
+            //         for i in range(4):
+            //             count = 0
+            //
+            //             if(i != x):
+            //                 print("     @Vector(3, T){ ", end="")
+            //             for j in range(4):
+            //                 if(i != x and j != y):
+            //                     count = count + 1
+            //                     if (count == 3):
+            //                         print(f"self.fields[{i}][{j}] ", end="")
+            //                     else:
+            //                         print(f"self.fields[{i}][{j}], ", end="")
+            //
+            //             if(i != x):
+            //                 print("},")
+            //
+            //         print("}) / det;")
+
+            result.fields[0][0] = det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[1][1], self.fields[1][2], self.fields[1][3] },
+                @Vector(3, T){ self.fields[2][1], self.fields[2][2], self.fields[2][3] },
+                @Vector(3, T){ self.fields[3][1], self.fields[3][2], self.fields[3][3] },
+            }) / det;
+            result.fields[1][0] = -det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[1][0], self.fields[1][2], self.fields[1][3] },
+                @Vector(3, T){ self.fields[2][0], self.fields[2][2], self.fields[2][3] },
+                @Vector(3, T){ self.fields[3][0], self.fields[3][2], self.fields[3][3] },
+            }) / det;
+            result.fields[2][0] = det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[1][0], self.fields[1][1], self.fields[1][3] },
+                @Vector(3, T){ self.fields[2][0], self.fields[2][1], self.fields[2][3] },
+                @Vector(3, T){ self.fields[3][0], self.fields[3][1], self.fields[3][3] },
+            }) / det;
+            result.fields[3][0] = -det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[1][0], self.fields[1][1], self.fields[1][2] },
+                @Vector(3, T){ self.fields[2][0], self.fields[2][1], self.fields[2][2] },
+                @Vector(3, T){ self.fields[3][0], self.fields[3][1], self.fields[3][2] },
+            }) / det;
+            result.fields[0][1] = -det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][1], self.fields[0][2], self.fields[0][3] },
+                @Vector(3, T){ self.fields[2][1], self.fields[2][2], self.fields[2][3] },
+                @Vector(3, T){ self.fields[3][1], self.fields[3][2], self.fields[3][3] },
+            }) / det;
+            result.fields[1][1] = det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][0], self.fields[0][2], self.fields[0][3] },
+                @Vector(3, T){ self.fields[2][0], self.fields[2][2], self.fields[2][3] },
+                @Vector(3, T){ self.fields[3][0], self.fields[3][2], self.fields[3][3] },
+            }) / det;
+            result.fields[2][1] = -det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][0], self.fields[0][1], self.fields[0][3] },
+                @Vector(3, T){ self.fields[2][0], self.fields[2][1], self.fields[2][3] },
+                @Vector(3, T){ self.fields[3][0], self.fields[3][1], self.fields[3][3] },
+            }) / det;
+            result.fields[3][1] = det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][0], self.fields[0][1], self.fields[0][2] },
+                @Vector(3, T){ self.fields[2][0], self.fields[2][1], self.fields[2][2] },
+                @Vector(3, T){ self.fields[3][0], self.fields[3][1], self.fields[3][2] },
+            }) / det;
+            result.fields[0][2] = det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][1], self.fields[0][2], self.fields[0][3] },
+                @Vector(3, T){ self.fields[1][1], self.fields[1][2], self.fields[1][3] },
+                @Vector(3, T){ self.fields[3][1], self.fields[3][2], self.fields[3][3] },
+            }) / det;
+            result.fields[1][2] = -det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][0], self.fields[0][2], self.fields[0][3] },
+                @Vector(3, T){ self.fields[1][0], self.fields[1][2], self.fields[1][3] },
+                @Vector(3, T){ self.fields[3][0], self.fields[3][2], self.fields[3][3] },
+            }) / det;
+            result.fields[2][2] = det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][0], self.fields[0][1], self.fields[0][3] },
+                @Vector(3, T){ self.fields[1][0], self.fields[1][1], self.fields[1][3] },
+                @Vector(3, T){ self.fields[3][0], self.fields[3][1], self.fields[3][3] },
+            }) / det;
+            result.fields[3][2] = -det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][0], self.fields[0][1], self.fields[0][2] },
+                @Vector(3, T){ self.fields[1][0], self.fields[1][1], self.fields[1][2] },
+                @Vector(3, T){ self.fields[3][0], self.fields[3][1], self.fields[3][2] },
+            }) / det;
+            result.fields[0][3] = -det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][1], self.fields[0][2], self.fields[0][3] },
+                @Vector(3, T){ self.fields[1][1], self.fields[1][2], self.fields[1][3] },
+                @Vector(3, T){ self.fields[2][1], self.fields[2][2], self.fields[2][3] },
+            }) / det;
+            result.fields[1][3] = det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][0], self.fields[0][2], self.fields[0][3] },
+                @Vector(3, T){ self.fields[1][0], self.fields[1][2], self.fields[1][3] },
+                @Vector(3, T){ self.fields[2][0], self.fields[2][2], self.fields[2][3] },
+            }) / det;
+            result.fields[2][3] = -det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][0], self.fields[0][1], self.fields[0][3] },
+                @Vector(3, T){ self.fields[1][0], self.fields[1][1], self.fields[1][3] },
+                @Vector(3, T){ self.fields[2][0], self.fields[2][1], self.fields[2][3] },
+            }) / det;
+            result.fields[3][3] = det3x3([3]@Vector(3, T){
+                @Vector(3, T){ self.fields[0][0], self.fields[0][1], self.fields[0][2] },
+                @Vector(3, T){ self.fields[1][0], self.fields[1][1], self.fields[1][2] },
+                @Vector(3, T){ self.fields[2][0], self.fields[2][1], self.fields[2][2] },
+            }) / det;
 
             return result;
         }
