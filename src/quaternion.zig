@@ -37,12 +37,11 @@ pub fn Quaternion(comptime T: type) type {
             return multiply(multiply(initFromRadians(vector.x, AxisType.x), initFromRadians(vector.y, AxisType.y)), initFromRadians(vector.z, AxisType.z));
         }
 
-        // yawn = y, pitch = X
-        pub fn initCamRotation(yawn: T, pitch: T) Quaternion(T) {
-            const yawn_w = @cos(yawn / 2);
+        pub fn initCamRotation(yaw: T, pitch: T) Quaternion(T) {
+            const yawn_w = @cos(yaw / 2);
             const pitch_w = @cos(pitch / 2);
 
-            const yawn_y = @sin(yawn / 2);
+            const yawn_y = @sin(yaw / 2);
             const pitch_x = @sin(pitch / 2);
 
             return .{
