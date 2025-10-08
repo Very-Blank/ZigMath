@@ -39,19 +39,28 @@ pub fn Quaternion(comptime T: type) type {
 
         pub fn initCamRotation(yaw: T, pitch: T) Quaternion(T) {
             const yawn_w = @cos(yaw / 2);
-            const pitch_w = @cos(pitch / 2);
-
             const yawn_y = @sin(yaw / 2);
+
+            const pitch_w = @cos(pitch / 2);
             const pitch_x = @sin(pitch / 2);
 
             return .{
                 .fields = @Vector(4, T){
-                    yawn_w * pitch_w,
-                    yawn_w * pitch_x,
-                    yawn_y * pitch_w,
-                    -yawn_y * pitch_x,
+                    pitch_w * yawn_w,
+                    pitch_x * yawn_w,
+                    pitch_w * yawn_y,
+                    pitch_x * yawn_y,
                 },
             };
+
+            // return .{
+            //     .fields = @Vector(4, T){
+            //         yawn_w * pitch_w,
+            //         yawn_w * pitch_x,
+            //         yawn_y * pitch_w,
+            //         -yawn_y * pitch_x,
+            //     },
+            // };
         }
 
         // Hamilton product
