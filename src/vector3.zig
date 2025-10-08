@@ -103,7 +103,18 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub inline fn rotate(vec1: Self, rotation: Quaternion(T)) Self {
+        pub inline fn rotateAroundY(vec1: Self, yawn: f32) Self {
+            const yawn_y = @sin(yawn / 2.0);
+            const yawn_w = @cos(yawn / 2.0);
+
+            return .{
+                .x = vec1.x + 2.0 * (yawn_y * vec1.z * yawn_w + yawn_y * yawn_y * vec1.z),
+                .y = vec1.y,
+                .z = vec1.z + 2.0 * (-yawn_y * vec1.x * yawn_w + yawn_y * yawn_y * vec1.x),
+            };
+        }
+
+        pub fn rotate(vec1: Self, rotation: Quaternion(T)) Self {
             const qVec = Self{
                 .x = rotation.fields[1],
                 .y = rotation.fields[2],
@@ -113,9 +124,9 @@ pub fn Vector3(comptime T: type) type {
             const uv = cross(qVec, vec1);
             const uuv = cross(qVec, uv);
             return vec1.add(
-                Self.multiply(
-                    Self.add(
-                        Self.multiply(
+                multiply(
+                    add(
+                        multiply(
                             uv,
                             .{
                                 .x = rotation.fields[0],
