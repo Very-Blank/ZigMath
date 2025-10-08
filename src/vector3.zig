@@ -104,13 +104,13 @@ pub fn Vector3(comptime T: type) type {
         }
 
         pub inline fn rotateAroundY(vec1: Self, yawn: f32) Self {
-            const yawn_y = @sin(yawn / 2.0);
-            const yawn_w = @cos(yawn / 2.0);
+            const cos_y = @cos(yawn);
+            const sin_y = @sin(yawn);
 
             return .{
-                .x = vec1.x + 2.0 * (yawn_y * vec1.z * yawn_w + yawn_y * yawn_y * vec1.z),
+                .x = vec1.x * cos_y + vec1.z * sin_y,
                 .y = vec1.y,
-                .z = vec1.z + 2.0 * (-yawn_y * vec1.x * yawn_w + yawn_y * yawn_y * vec1.x),
+                .z = -vec1.x * sin_y + vec1.z * cos_y,
             };
         }
 
