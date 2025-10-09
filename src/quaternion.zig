@@ -1,5 +1,5 @@
 const Vector3 = @import("vector3.zig").Vector3;
-pub const AxisType = enum { x, y, z };
+const AxisType = @import("axis.zig").AxisType;
 
 pub fn Quaternion(comptime T: type) type {
     switch (@typeInfo(T)) {

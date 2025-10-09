@@ -2,6 +2,7 @@ const std = @import("std");
 
 const Quaternion = @import("quaternion.zig").Quaternion;
 const Vector2 = @import("vector2.zig").Vector2;
+const AxisType = @import("axis.zig").AxisType;
 
 pub fn Vector3(comptime T: type) type {
     switch (@typeInfo(T)) {
@@ -103,14 +104,26 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub inline fn rotateAroundY(vec1: Self, yawn: f32) Self {
-            const cos_y = @cos(yawn);
-            const sin_y = @sin(yawn);
+        pub inline fn rotateAroundAxis(vec1: Self, comptime axis: AxisType, radians: f32) Self {
+            const cos = @cos(radians);
+            const sin = @sin(radians);
 
-            return .{
-                .x = vec1.x * cos_y + vec1.z * sin_y,
-                .y = vec1.y,
-                .z = -vec1.x * sin_y + vec1.z * cos_y,
+            return switch (axis) {
+                .x => .{
+                    .x = vec1.x,
+                    .y = vec1.y * cos - vec1.z * sin,
+                    .z = vec1.y * sin + vec1.z * cos,
+                },
+                .y => .{
+                    .x = vec1.x * cos + vec1.z * sin,
+                    .y = vec1.y,
+                    .z = -vec1.x * sin + vec1.z * cos,
+                },
+                .z => .{
+                    .x = vec1.x * cos - vec1.y * sin,
+                    .y = vec1.x * sin - vec1.y * cos,
+                    .z = vec1.z,
+                },
             };
         }
 
