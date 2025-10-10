@@ -14,7 +14,7 @@ pub fn Quaternion(comptime T: type) type {
 
         const Self = @This();
 
-        pub fn initFromRadians(radians: T, axis: AxisType) Self {
+        pub fn initFromRadians(comptime axis: AxisType, radians: T) Self {
             switch (axis) {
                 .x => {
                     return .{
