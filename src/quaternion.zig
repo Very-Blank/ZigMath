@@ -56,7 +56,7 @@ pub fn Quaternion(comptime T: type) type {
             };
         }
 
-        pub fn addRotationAroundAxis(self: Self, radians: T, comptime axis: AxisType) Self {
+        pub fn addRotationAroundAxis(self: Self, comptime axis: AxisType, radians: T) Self {
             const rad_cos = @cos(radians / 2);
             const rad_sin = @sin(radians / 2);
 
