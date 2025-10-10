@@ -23,7 +23,7 @@ pub fn Vector3(comptime T: type) type {
         pub const right: Self = .{ .x = 1.0, .y = 0.0, .z = 0.0 };
         pub const forward: Self = .{ .x = 0.0, .y = 0.0, .z = 1.0 };
 
-        pub inline fn Vector3To2(self: *const Self) Vector2(T) {
+        pub inline fn vector3To2(self: *const Self) Vector2(T) {
             return .{
                 .x = self.x,
                 .y = self.y,

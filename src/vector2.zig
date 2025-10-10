@@ -93,7 +93,7 @@ pub fn Vector2(comptime T: type) type {
         }
 
         pub inline fn normalize(vec1: Self) Self {
-            return .segment(vec1, length(vec1));
+            return segment(vec1, length(vec1));
         }
     };
 }

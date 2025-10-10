@@ -14,7 +14,7 @@ pub fn Mat4(comptime T: type) type {
 
         const Self = @This();
 
-        pub const ZERO = Self{
+        pub const zero = Self{
             .fields = [4]@Vector(4, T){
                 @Vector(4, T){ 0.0, 0.0, 0.0, 0.0 },
                 @Vector(4, T){ 0.0, 0.0, 0.0, 0.0 },
@@ -23,7 +23,7 @@ pub fn Mat4(comptime T: type) type {
             },
         };
 
-        pub const IDENTITY = Self{
+        pub const identity = Self{
             .fields = [4]@Vector(4, T){
                 @Vector(4, T){ 1.0, 0.0, 0.0, 0.0 },
                 @Vector(4, T){ 0.0, 1.0, 0.0, 0.0 },
@@ -63,7 +63,7 @@ pub fn Mat4(comptime T: type) type {
             return result;
         }
 
-        pub fn perspective(fov: T, aspect: T, near: T, far: T) Self {
+        pub fn initPerspective(fov: T, aspect: T, near: T, far: T) Self {
             std.debug.assert(@abs(aspect - 0.001) > 0);
             return .{
                 .fields = [4]@Vector(4, T){
@@ -75,7 +75,7 @@ pub fn Mat4(comptime T: type) type {
             };
         }
 
-        pub fn ortho(left: T, right: T, bottom: T, top: T, zNear: T, zFar: T) Self {
+        pub fn initOrtho(left: T, right: T, bottom: T, top: T, zNear: T, zFar: T) Self {
             return .{ .fields = [4]@Vector(4, T){
                 @Vector(4, T){ 2.0 / (right - left), 0.0, 0.0, -(right + left) / (right - left) },
                 @Vector(4, T){ 0.0, 2.0 / (top - bottom), 0.0, -(top + bottom) / (top - bottom) },
@@ -84,7 +84,7 @@ pub fn Mat4(comptime T: type) type {
             } };
         }
 
-        pub fn rotation(rot: quat.Quaternion(T)) Self {
+        pub fn initFromRotation(rot: quat.Quaternion(T)) Self {
             return .{
                 .fields = [4]@Vector(4, T){
                     @Vector(4, T){
@@ -272,7 +272,7 @@ pub fn Mat4(comptime T: type) type {
             // zig fmt: on
         }
 
-        pub fn scale(sc: Vector3(T)) Self {
+        pub inline fn initScale(sc: Vector3(T)) Self {
             return .{
                 .fields = [4]@Vector(4, T){
                     @Vector(4, T){ sc.x, 0.0, 0.0, 0.0 },
@@ -283,7 +283,7 @@ pub fn Mat4(comptime T: type) type {
             };
         }
 
-        pub fn translate(pos: Vector3(T)) Self {
+        pub inline fn initTranslate(pos: Vector3(T)) Self {
             return .{
                 .fields = [4]@Vector(4, T){
                     @Vector(4, T){ 1.0, 0.0, 0.0, 0.0 },
@@ -294,17 +294,17 @@ pub fn Mat4(comptime T: type) type {
             };
         }
 
-        pub inline fn view(pos: Vector3(T), rot: quat.Quaternion(T)) Self {
-            return multiply(translate(pos), rotation(rot));
+        pub inline fn initView(pos: Vector3(T), rot: quat.Quaternion(T)) Self {
+            return multiply(initTranslate(pos), initFromRotation(rot));
         }
 
-        pub inline fn model(pos: Vector3(T), sc: Vector3(T), rot: quat.Quaternion(T)) Self {
+        pub inline fn initModel(pos: Vector3(T), sc: Vector3(T), rot: quat.Quaternion(T)) Self {
             return multiply(
                 multiply(
-                    rotation(rot),
-                    scale(sc),
+                    initFromRotation(rot),
+                    initScale(sc),
                 ),
-                translate(pos),
+                initTranslate(pos),
             );
         }
     };
