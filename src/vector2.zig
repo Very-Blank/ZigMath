@@ -80,15 +80,19 @@ pub fn Vector2(comptime T: type) type {
             };
         }
 
-        pub inline fn dot(vec1: Self, vec2: Self) f32 {
+        pub inline fn dot(vec1: Self, vec2: Self) T {
             return vec1.x * vec2.x + vec1.y * vec2.y;
         }
 
-        pub inline fn length(vec1: Self) f32 {
+        pub inline fn length(vec1: Self) T {
             return @sqrt(vec1.x * vec1.x + vec1.y * vec1.y);
         }
 
-        pub inline fn distance(vec1: Self, vec2: Self) f32 {
+        pub inline fn magnitude(vec1: Self) T {
+            return vec1.x * vec1.x + vec1.y * vec1.y;
+        }
+
+        pub inline fn distance(vec1: Self, vec2: Self) T {
             return @sqrt((vec2.x - vec1.x) * (vec2.x - vec1.x) + (vec2.y - vec1.y) * (vec2.y - vec1.y));
         }
 
