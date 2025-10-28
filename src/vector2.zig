@@ -101,7 +101,7 @@ pub fn Vector2(comptime T: type) type {
         }
 
         pub fn pointsDistanceToLine(a: Self, b: Self, p: Self) f32 {
-            const length_squared = magnitude(a, b);
+            const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
 
             const dot_product = @max(0.0, @min(1.0, dot(p.subtract(a), b.subtract(a)) / length_squared));
@@ -110,7 +110,7 @@ pub fn Vector2(comptime T: type) type {
         }
 
         pub fn closestPointOnLine(a: Self, b: Self, p: Self) Self {
-            const length_squared = magnitude(a, b);
+            const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
 
             const dot_product = @max(0.0, @min(1.0, dot(p.subtract(a), b.subtract(a)) / length_squared));
