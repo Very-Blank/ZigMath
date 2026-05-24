@@ -3,11 +3,17 @@ const std = @import("std");
 const Quaternion = @import("quaternion.zig").Quaternion;
 const Vector2 = @import("vector2.zig").Vector2;
 const AxisType = @import("axis.zig").AxisType;
+const Type = @import("type.zig").Type;
 
-pub fn Vector3(comptime T: type) type {
+pub fn Vector3(comptime T: type, comptime Unique: type) type {
     switch (@typeInfo(T)) {
         .float, .comptime_float => {},
         else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type."),
+    }
+
+    switch (@typeInfo(Unique)) {
+        .@"opaque" => {},
+        else => @compileError("Unexpected type was given: " ++ @typeName(Unique) ++ ", expected an opaque"),
     }
 
     return struct {
@@ -15,7 +21,12 @@ pub fn Vector3(comptime T: type) type {
         y: T = 0.0,
         z: T = 0.0,
 
+        const _unique = Unique;
+
         const Self = @This();
+
+        pub const InnerType: type = T;
+        pub const @"type": Type = .vector3;
 
         pub const zero: Self = .{ .x = 0.0, .y = 0.0, .z = 0.0 };
         pub const one: Self = .{ .x = 1.0, .y = 1.0, .z = 1.0 };
@@ -23,14 +34,28 @@ pub fn Vector3(comptime T: type) type {
         pub const right: Self = .{ .x = 1.0, .y = 0.0, .z = 0.0 };
         pub const forward: Self = .{ .x = 0.0, .y = 0.0, .z = 1.0 };
 
-        pub inline fn vector3To2(self: *const Self) Vector2(T) {
-            return .{
-                .x = self.x,
-                .y = self.y,
-            };
+        fn assertCompatible(other: anytype, expected: Type) void {
+            switch (@typeInfo(other)) {
+                .@"struct" => {},
+                else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
+            }
+
+            if (!@hasDecl(@TypeOf(other), "InnerType")) @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
+
+            switch (@typeInfo(@TypeOf(other.InnerType))) {
+                .type => {},
+                else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
+            }
+
+            if (!@hasDecl(@TypeOf(other), "type") or @TypeOf(other.type) != Type or other.type != expected)
+                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
+
+            if (InnerType != @TypeOf(other).InnerType) @compileError("Unexpected innter type difference.");
         }
 
-        pub inline fn add(vec1: Self, vec2: Self) Self {
+        pub inline fn add(vec1: Self, vec2: anytype) Self {
+            assertCompatible(vec2, .vector3);
+
             return .{
                 .x = vec1.x + vec2.x,
                 .y = vec1.y + vec2.y,
@@ -38,7 +63,9 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub inline fn subtract(vec1: Self, vec2: Self) Self {
+        pub inline fn subtract(vec1: Self, vec2: anytype) Self {
+            assertCompatible(vec2, .vector3);
+
             return .{
                 .x = vec1.x - vec2.x,
                 .y = vec1.y - vec2.y,
@@ -46,7 +73,9 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub inline fn multiply(vec1: Self, vec2: Self) Self {
+        pub inline fn multiply(vec1: Self, vec2: anytype) Self {
+            assertCompatible(vec2, .vector3);
+
             return .{
                 .x = vec1.x * vec2.x,
                 .y = vec1.y * vec2.y,
@@ -54,7 +83,9 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub inline fn divide(vec1: Self, vec2: Self) Self {
+        pub inline fn divide(vec1: Self, vec2: anytype) Self {
+            assertCompatible(vec2, .vector3);
+
             std.debug.assert(vec2.x != 0.0);
             std.debug.assert(vec2.y != 0.0);
             std.debug.assert(vec2.z != 0.0);
@@ -92,11 +123,15 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub inline fn dot(vec1: Self, vec2: Self) T {
+        pub inline fn dot(vec1: Self, vec2: anytype) T {
+            assertCompatible(vec2, .vector3);
+
             return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
         }
 
-        pub inline fn cross(vec1: Self, vec2: Self) Self {
+        pub inline fn cross(vec1: Self, vec2: anytype) Self {
+            assertCompatible(vec2, .vector3);
+
             return .{
                 .x = vec1.y * vec2.z - vec1.z * vec2.y,
                 .y = vec1.z * vec2.x - vec1.x * vec2.z,
@@ -127,7 +162,9 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub fn rotate(vec1: Self, rotation: Quaternion(T)) Self {
+        pub fn rotate(vec1: Self, rotation: anytype) Self {
+            assertCompatible(rotation, .quaternion);
+
             const qVec = Self{
                 .x = rotation.fields[1],
                 .y = rotation.fields[2],
@@ -170,7 +207,10 @@ pub fn Vector3(comptime T: type) type {
             return vec1.segment(length(vec1));
         }
 
-        pub fn pointsDistanceToLine(a: Self, b: Self, p: Self) f32 {
+        pub fn pointsDistanceToLine(a: Self, b: anytype, p: anytype) f32 {
+            assertCompatible(b, .vector3);
+            assertCompatible(p, .vector3);
+
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
 
@@ -179,7 +219,10 @@ pub fn Vector3(comptime T: type) type {
             return p.distance(projection);
         }
 
-        pub fn closestPointOnLine(a: Self, b: Self, p: Self) Self {
+        pub fn closestPointOnLine(a: Self, b: anytype, p: anytype) Self {
+            assertCompatible(b, .vector3);
+            assertCompatible(p, .vector3);
+
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
 

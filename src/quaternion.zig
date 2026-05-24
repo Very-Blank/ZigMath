@@ -1,18 +1,47 @@
-const Vector3 = @import("vector3.zig").Vector3;
 const AxisType = @import("axis.zig").AxisType;
+const Type = @import("type.zig").Type;
 
-pub fn Quaternion(comptime T: type) type {
+pub fn Quaternion(comptime T: type, Unique: type) type {
     switch (@typeInfo(T)) {
         .float, .comptime_float => {},
         else => @compileError("Type not supported. Was given " ++ @typeName(T) ++ " type."),
     }
 
+    switch (@typeInfo(Unique)) {
+        .@"opaque" => {},
+        else => @compileError("Unexpected type was given: " ++ @typeName(Unique) ++ ", expected an opaque"),
+    }
+
     return struct {
         fields: @Vector(4, T),
 
-        pub const identity: Self = .{ .fields = @Vector(4, T){ 1, 0, 0, 0 } };
+        const _unique = Unique;
 
         const Self = @This();
+
+        pub const InnerType = T;
+        pub const @"type": Type = .quaternion;
+
+        pub const identity: Self = .{ .fields = @Vector(4, T){ 1, 0, 0, 0 } };
+
+        fn assertCompatible(other: anytype, expected: Type) void {
+            switch (@typeInfo(other)) {
+                .@"struct" => {},
+                else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
+            }
+
+            if (!@hasDecl(@TypeOf(other), "InnerType")) @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
+
+            switch (@typeInfo(@TypeOf(other.InnerType))) {
+                .type => {},
+                else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
+            }
+
+            if (!@hasDecl(@TypeOf(other), "type") or @TypeOf(other.type) != Type or other.type != expected)
+                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
+
+            if (InnerType != @TypeOf(other).InnerType) @compileError("Unexpected innter type difference.");
+        }
 
         pub fn initFromRadians(comptime axis: AxisType, radians: T) Self {
             switch (axis) {
@@ -35,7 +64,9 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         // Uses x, y, z order
-        pub fn initFromVector(vector: Vector3) Self {
+        pub fn initFromVector(vector: anytype) Self {
+            assertCompatible(vector, .vector3);
+
             return multiply(multiply(initFromRadians(vector.x, .x), initFromRadians(vector.y, .y)), initFromRadians(vector.z, .z));
         }
 
@@ -89,7 +120,9 @@ pub fn Quaternion(comptime T: type) type {
         }
 
         // Hamilton product
-        pub fn multiply(quat1: Self, quat2: Self) Self {
+        pub fn multiply(quat1: Self, quat2: anytype) Self {
+            assertCompatible(quat2, .quaternion);
+
             return .{
                 .fields = @Vector(4, T){
                     quat1.fields[0] * quat2.fields[0] - quat1.fields[1] * quat2.fields[1] - quat1.fields[2] * quat2.fields[2] - quat1.fields[3] * quat2.fields[3],
