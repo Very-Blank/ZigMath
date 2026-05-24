@@ -65,7 +65,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
 
         // Uses x, y, z order
         pub fn initFromVector(vector: anytype) Self {
-            assertCompatible(vector, .vector3);
+            comptime assertCompatible(vector, .vector3);
 
             return multiply(multiply(initFromRadians(vector.x, .x), initFromRadians(vector.y, .y)), initFromRadians(vector.z, .z));
         }
@@ -121,7 +121,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
 
         // Hamilton product
         pub fn multiply(quat1: Self, quat2: anytype) Self {
-            assertCompatible(quat2, .quaternion);
+            comptime assertCompatible(quat2, .quaternion);
 
             return .{
                 .fields = @Vector(4, T){

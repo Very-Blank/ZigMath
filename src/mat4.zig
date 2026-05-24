@@ -58,7 +58,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn multiply(mat1: Self, mat2: anytype) Self {
-            assertCompatible(mat2, .mat4);
+            comptime assertCompatible(mat2, .mat4);
 
             var result: [4]@Vector(4, T) = [4]@Vector(4, T){
                 @Vector(4, T){ 0.0, 0.0, 0.0, 0.0 },
@@ -112,7 +112,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn initFromRotation(rot: anytype) Self {
-            assertCompatible(rot, .quaternion);
+            comptime assertCompatible(rot, .quaternion);
 
             return .{
                 .fields = [4]@Vector(4, T){
@@ -302,7 +302,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initScale(sc: anytype) Self {
-            assertCompatible(sc, .vector3);
+            comptime assertCompatible(sc, .vector3);
 
             return .{
                 .fields = [4]@Vector(4, T){
@@ -315,7 +315,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initTranslate(pos: anytype) Self {
-            assertCompatible(pos, .vector3);
+            comptime assertCompatible(pos, .vector3);
 
             return .{
                 .fields = [4]@Vector(4, T){
@@ -328,16 +328,16 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initView(pos: anytype, rot: anytype) Self {
-            assertCompatible(pos, .vector3);
-            assertCompatible(rot, .quaternion);
+            comptime assertCompatible(pos, .vector3);
+            comptime assertCompatible(rot, .quaternion);
 
             return multiply(initTranslate(pos), initFromRotation(rot));
         }
 
         pub inline fn initModel(pos: anytype, sc: anytype, rot: anytype) Self {
-            assertCompatible(pos, .vector3);
-            assertCompatible(sc, .vector3);
-            assertCompatible(rot, .quaternion);
+            comptime assertCompatible(pos, .vector3);
+            comptime assertCompatible(sc, .vector3);
+            comptime assertCompatible(rot, .quaternion);
 
             return multiply(
                 multiply(
