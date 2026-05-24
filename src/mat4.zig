@@ -329,7 +329,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initModel(pos: anytype, sc: anytype, rot: anytype) Self {
-            assertCompatible(@TypeOf(pos), .vector4);
+            assertCompatible(@TypeOf(pos), .vector3);
             assertCompatible(@TypeOf(sc), .vector3);
             assertCompatible(@TypeOf(rot), .quaternion);
 
