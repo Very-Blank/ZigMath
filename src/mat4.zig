@@ -38,27 +38,27 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
             },
         };
 
-        inline fn assertCompatible(other: anytype, expected: Type) void {
+        fn assertCompatible(comptime other: type, comptime expected: Type) void {
             switch (@typeInfo(other)) {
                 .@"struct" => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
             }
 
-            if (!@hasDecl(@TypeOf(other), "InnerType")) @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
+            if (!@hasDecl(other, "InnerType")) @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
 
-            switch (@typeInfo(@TypeOf(other.InnerType))) {
+            switch (@typeInfo(other.InnerType)) {
                 .type => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
             }
 
-            if (!@hasDecl(@TypeOf(other), "type") or @TypeOf(other.type) != Type or other.type != expected)
+            if (!@hasDecl(other, "type") or @TypeOf(other.type) != Type or other.type != expected)
                 @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
 
-            if (InnerType != @TypeOf(other).InnerType) @compileError("Unexpected innter type difference.");
+            if (InnerType != other.InnerType) @compileError("Unexpected innter type difference.");
         }
 
         pub fn multiply(mat1: Self, mat2: anytype) Self {
-            comptime assertCompatible(mat2, .mat4);
+            assertCompatible(@TypeOf(mat2), .mat4);
 
             var result: [4]@Vector(4, T) = [4]@Vector(4, T){
                 @Vector(4, T){ 0.0, 0.0, 0.0, 0.0 },
@@ -112,7 +112,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn initFromRotation(rot: anytype) Self {
-            comptime assertCompatible(rot, .quaternion);
+            assertCompatible(@TypeOf(rot), .quaternion);
 
             return .{
                 .fields = [4]@Vector(4, T){
@@ -302,7 +302,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initScale(sc: anytype) Self {
-            comptime assertCompatible(sc, .vector3);
+            assertCompatible(@TypeOf(sc), .vector3);
 
             return .{
                 .fields = [4]@Vector(4, T){
@@ -315,7 +315,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initTranslate(pos: anytype) Self {
-            comptime assertCompatible(pos, .vector3);
+            assertCompatible(@TypeOf(pos), .vector3);
 
             return .{
                 .fields = [4]@Vector(4, T){
@@ -328,16 +328,16 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initView(pos: anytype, rot: anytype) Self {
-            comptime assertCompatible(pos, .vector3);
-            comptime assertCompatible(rot, .quaternion);
+            assertCompatible(@TypeOf(pos), .vector3);
+            assertCompatible(@TypeOf(rot), .quaternion);
 
             return multiply(initTranslate(pos), initFromRotation(rot));
         }
 
         pub inline fn initModel(pos: anytype, sc: anytype, rot: anytype) Self {
-            comptime assertCompatible(pos, .vector3);
-            comptime assertCompatible(sc, .vector3);
-            comptime assertCompatible(rot, .quaternion);
+            assertCompatible(@TypeOf(pos), .vector4);
+            assertCompatible(@TypeOf(sc), .vector3);
+            assertCompatible(@TypeOf(rot), .quaternion);
 
             return multiply(
                 multiply(

@@ -28,27 +28,27 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         pub const one: Self = .{ .x = 1.0, .y = 1.0 };
         pub const zero: Self = .{ .x = 0.0, .y = 0.0 };
 
-        inline fn assertCompatible(other: anytype, comptime expected: Type) void {
+        fn assertCompatible(comptime other: type, comptime expected: Type) void {
             switch (@typeInfo(other)) {
                 .@"struct" => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
             }
 
-            if (!@hasDecl(@TypeOf(other), "InnerType")) @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
+            if (!@hasDecl(other, "InnerType")) @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
 
-            switch (@typeInfo(@TypeOf(other.InnerType))) {
+            switch (@typeInfo(other.InnerType)) {
                 .type => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
             }
 
-            if (!@hasDecl(@TypeOf(other), "type") or @TypeOf(other.type) != Type or other.type != expected)
+            if (!@hasDecl(other, "type") or @TypeOf(other.type) != Type or other.type != expected)
                 @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
 
-            if (InnerType != @TypeOf(other).InnerType) @compileError("Unexpected innter type difference.");
+            if (InnerType != other.InnerType) @compileError("Unexpected innter type difference.");
         }
 
         pub inline fn add(vec1: Self, vec2: anytype) Self {
-            comptime assertCompatible(vec2, .vector2);
+            assertCompatible(@TypeOf(vec2), .vector2);
 
             return .{
                 .x = vec1.x + vec2.x,
@@ -57,7 +57,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn subtract(vec1: Self, vec2: anytype) Self {
-            comptime assertCompatible(vec2, .vector2);
+            assertCompatible(@TypeOf(vec2), .vector2);
 
             return .{
                 .x = vec1.x - vec2.x,
@@ -66,7 +66,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn multiply(vec1: Self, vec2: anytype) Self {
-            comptime assertCompatible(vec2, .vector2);
+            assertCompatible(@TypeOf(vec2), .vector2);
 
             return .{
                 .x = vec1.x * vec2.x,
@@ -75,7 +75,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn divide(vec1: Self, vec2: anytype) Self {
-            comptime assertCompatible(vec2, .vector2);
+            assertCompatible(@TypeOf(vec2), .vector2);
 
             std.debug.assert(vec2.x != 0.0);
             std.debug.assert(vec2.y != 0.0);
@@ -110,7 +110,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn dot(vec1: Self, vec2: anytype) T {
-            comptime assertCompatible(vec2, .vector2);
+            assertCompatible(@TypeOf(vec2), .vector2);
 
             return vec1.x * vec2.x + vec1.y * vec2.y;
         }
@@ -124,7 +124,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn distance(vec1: Self, vec2: anytype) T {
-            comptime assertCompatible(vec2, .vector2);
+            assertCompatible(@TypeOf(vec2), .vector2);
 
             return @sqrt((vec2.x - vec1.x) * (vec2.x - vec1.x) + (vec2.y - vec1.y) * (vec2.y - vec1.y));
         }
@@ -134,8 +134,8 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn pointsDistanceToLine(a: Self, b: anytype, p: anytype) f32 {
-            comptime assertCompatible(b, .vector2);
-            comptime assertCompatible(p, .vector2);
+            assertCompatible(@TypeOf(b), .vector2);
+            assertCompatible(@TypeOf(p), .vector2);
 
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
@@ -146,8 +146,8 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn closestPointOnLine(a: Self, b: anytype, p: anytype) Self {
-            comptime assertCompatible(b, .vector2);
-            comptime assertCompatible(p, .vector2);
+            assertCompatible(@TypeOf(b), .vector2);
+            assertCompatible(@TypeOf(p), .vector2);
 
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);

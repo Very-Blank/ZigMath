@@ -24,23 +24,23 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
 
         pub const identity: Self = .{ .fields = @Vector(4, T){ 1, 0, 0, 0 } };
 
-        inline fn assertCompatible(other: anytype, expected: Type) void {
+        fn assertCompatible(comptime other: type, comptime expected: Type) void {
             switch (@typeInfo(other)) {
                 .@"struct" => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
             }
 
-            if (!@hasDecl(@TypeOf(other), "InnerType")) @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
+            if (!@hasDecl(other, "InnerType")) @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
 
-            switch (@typeInfo(@TypeOf(other.InnerType))) {
+            switch (@typeInfo(other.InnerType)) {
                 .type => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
             }
 
-            if (!@hasDecl(@TypeOf(other), "type") or @TypeOf(other.type) != Type or other.type != expected)
+            if (!@hasDecl(other, "type") or @TypeOf(other.type) != Type or other.type != expected)
                 @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
 
-            if (InnerType != @TypeOf(other).InnerType) @compileError("Unexpected innter type difference.");
+            if (InnerType != other.InnerType) @compileError("Unexpected innter type difference.");
         }
 
         pub fn initFromRadians(comptime axis: AxisType, radians: T) Self {
@@ -65,7 +65,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
 
         // Uses x, y, z order
         pub fn initFromVector(vector: anytype) Self {
-            comptime assertCompatible(vector, .vector3);
+            assertCompatible(@TypeOf(vector), .vector3);
 
             return multiply(multiply(initFromRadians(vector.x, .x), initFromRadians(vector.y, .y)), initFromRadians(vector.z, .z));
         }
@@ -121,7 +121,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
 
         // Hamilton product
         pub fn multiply(quat1: Self, quat2: anytype) Self {
-            comptime assertCompatible(quat2, .quaternion);
+            assertCompatible(@TypeOf(quat2), .quaternion);
 
             return .{
                 .fields = @Vector(4, T){
