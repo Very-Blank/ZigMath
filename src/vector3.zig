@@ -40,7 +40,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
             }
 
-            if (!@hasDecl(other, "InnerType" or InnerType != other.InnerType))
+            if (!@hasDecl(other, "InnerType") or InnerType != other.InnerType)
                 @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
 
             if (!@hasDecl(other, "type") or @TypeOf(other.type) != Type or other.type != expected)
