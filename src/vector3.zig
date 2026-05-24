@@ -34,7 +34,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         pub const right: Self = .{ .x = 1.0, .y = 0.0, .z = 0.0 };
         pub const forward: Self = .{ .x = 0.0, .y = 0.0, .z = 1.0 };
 
-        fn assertCompatible(other: anytype, comptime expected: Type) void {
+        inline fn assertCompatible(other: anytype, comptime expected: Type) void {
             switch (@typeInfo(other)) {
                 .@"struct" => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),

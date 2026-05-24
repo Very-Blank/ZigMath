@@ -28,7 +28,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         pub const one: Self = .{ .x = 1.0, .y = 1.0 };
         pub const zero: Self = .{ .x = 0.0, .y = 0.0 };
 
-        fn assertCompatible(other: anytype, comptime expected: Type) void {
+        inline fn assertCompatible(other: anytype, comptime expected: Type) void {
             switch (@typeInfo(other)) {
                 .@"struct" => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),

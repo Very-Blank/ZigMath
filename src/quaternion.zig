@@ -24,7 +24,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
 
         pub const identity: Self = .{ .fields = @Vector(4, T){ 1, 0, 0, 0 } };
 
-        fn assertCompatible(other: anytype, expected: Type) void {
+        inline fn assertCompatible(other: anytype, expected: Type) void {
             switch (@typeInfo(other)) {
                 .@"struct" => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),

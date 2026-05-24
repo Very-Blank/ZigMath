@@ -38,7 +38,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
             },
         };
 
-        fn assertCompatible(other: anytype, expected: Type) void {
+        inline fn assertCompatible(other: anytype, expected: Type) void {
             switch (@typeInfo(other)) {
                 .@"struct" => {},
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
