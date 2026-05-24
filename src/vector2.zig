@@ -34,17 +34,11 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
                 else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
             }
 
-            if (!@hasDecl(other, "InnerType")) @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-
-            switch (@typeInfo(other.InnerType)) {
-                .type => {},
-                else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
-            }
+            if (!@hasDecl(other, "InnerType" or InnerType != other.InnerType))
+                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
 
             if (!@hasDecl(other, "type") or @TypeOf(other.type) != Type or other.type != expected)
                 @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-
-            if (InnerType != other.InnerType) @compileError("Unexpected innter type difference.");
         }
 
         pub inline fn add(vec1: Self, vec2: anytype) Self {
