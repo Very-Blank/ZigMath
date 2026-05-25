@@ -61,7 +61,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
         pub fn initFromVector(vector: anytype) Self {
             assertCompatible(@TypeOf(vector), .vector3);
 
-            return multiply(multiply(initFromRadians(vector.x, .x), initFromRadians(vector.y, .y)), initFromRadians(vector.z, .z));
+            return multiply(multiply(initFromRadians(.x, vector.x), initFromRadians(.y, .vector.y)), initFromRadians(.z, vector.z));
         }
 
         pub fn initCamRotation(yaw: T, pitch: T) Self {
