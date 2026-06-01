@@ -181,7 +181,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
                     add(
                         multiply(
                             uv,
-                            .{
+                            Self{
                                 .x = rotation.fields[0],
                                 .y = rotation.fields[0],
                                 .z = rotation.fields[0],
@@ -189,7 +189,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
                         ),
                         uuv,
                     ),
-                    .{ .x = 2.0, .y = 2.0, .z = 2.0 },
+                    Self{ .x = 2.0, .y = 2.0, .z = 2.0 },
                 ),
             );
         }
