@@ -202,7 +202,8 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
             return vec1.x * vec1.x + vec1.y * vec1.y + vec1.z * vec1.z;
         }
 
-        pub inline fn distance(vec1: Self, vec2: Self) T {
+        pub inline fn distance(vec1: Self, vec2: anytype) T {
+            assertCompatible(@TypeOf(vec2), .vector3);
             return @sqrt((vec2.x - vec1.x) * (vec2.x - vec1.x) + (vec2.y - vec1.y) * (vec2.y - vec1.y) + (vec2.z - vec1.z) * (vec2.z - vec1.z));
         }
 
