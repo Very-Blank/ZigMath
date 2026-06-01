@@ -218,7 +218,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
 
-            const dot_product = @max(0.0, @min(1.0, dot(p.subtract(a), b.subtract(a)) / length_squared));
+            const dot_product = @max(0.0, @min(1.0, p.subtract(a).dot(b.subtract(a)) / length_squared));
             const projection = a.add(b.subtract(a)).scale(dot_product);
             return p.distance(projection);
         }
@@ -230,7 +230,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
 
-            const dot_product = @max(0.0, @min(1.0, dot(p.subtract(a), b.subtract(a)) / length_squared));
+            const dot_product = @max(0.0, @min(1.0, p.subtract(a).dot(b.subtract(a)) / length_squared));
             return a.add(b.subtract(a).scale(dot_product));
         }
     };
