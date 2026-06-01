@@ -48,7 +48,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn coerce(self: Self, comptime to: type) to {
-            assertCompatible(@TypeOf(to), .vector3);
+            assertCompatible(to, .vector3);
             return .{
                 .x = self.x,
                 .y = self.y,
