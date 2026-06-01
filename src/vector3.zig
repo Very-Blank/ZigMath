@@ -47,6 +47,15 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
                 @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
         }
 
+        pub inline fn coerce(self: Self, comptime to: type) to {
+            assertCompatible(@TypeOf(to), .vector3);
+            return .{
+                .x = self.x,
+                .y = self.y,
+                .z = self.z,
+            };
+        }
+
         pub inline fn add(vec1: Self, vec2: anytype) Self {
             assertCompatible(@TypeOf(vec2), .vector3);
 
