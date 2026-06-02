@@ -78,7 +78,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
             var result: [4]T = .{ 0, 0, 0, 0 };
             for (0..4) |i| {
                 for (0..4) |j| {
-                    result[i] += mat.fields[i][j] * vec[j];
+                    result[i] += mat.fields[j][i] * vec[j];
                 }
             }
             return result;
