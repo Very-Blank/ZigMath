@@ -64,6 +64,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
             return multiply(multiply(initFromRadians(.x, vector.x), initFromRadians(.y, vector.y)), initFromRadians(.z, vector.z));
         }
 
+        // From: https://github.com/g-truc/glm
         pub fn initFromMatrix(mat: anytype) Self {
             assertCompatible(@TypeOf(mat), .mat4);
             var quaternion: Self = undefined;
@@ -162,6 +163,15 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
                     quat1.fields[0] * quat2.fields[2] - quat1.fields[1] * quat2.fields[3] + quat1.fields[2] * quat2.fields[0] + quat1.fields[3] * quat2.fields[1],
                     quat1.fields[0] * quat2.fields[3] + quat1.fields[1] * quat2.fields[2] - quat1.fields[2] * quat2.fields[1] + quat1.fields[3] * quat2.fields[0],
                 },
+            };
+        }
+
+        pub fn normalize(self: Self) Self {
+            const magnitude: T = self.fields[0] * self.fields[0] + self.fields[1] * self.fields[1] + self.fields[2] * self.fields[2] + self.fields[3] * self.fields[3];
+            const scale: T = if (@abs(1.0 - magnitude) < 2.107342e-08) 2.0 / (1.0 + magnitude) else 1.0 / @sqrt(magnitude);
+
+            return .{
+                .fields = .{ self.fields[0] / scale, self.fields[1] / scale, self.fields[2] / scale, self.fields[3] / scale },
             };
         }
     };
