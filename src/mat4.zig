@@ -64,7 +64,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
             for (0..4) |i| {
                 for (0..4) |j| {
                     for (0..4) |k| {
-                        result[i][j] += mat1.fields[i][k] * mat2.fields[k][j];
+                        result[i][j] += mat1.fields[k][j] * mat2.fields[i][k];
                     }
                 }
             }
@@ -98,10 +98,10 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
 
         pub fn initOrtho(left: T, right: T, bottom: T, top: T, zNear: T, zFar: T) Self {
             return .{ .fields = [4][4]T{
-                [4]T{ 2.0 / (right - left), 0.0, 0.0, -(right + left) / (right - left) },
-                [4]T{ 0.0, 2.0 / (top - bottom), 0.0, -(top + bottom) / (top - bottom) },
-                [4]T{ 0.0, 0.0, -1.0 / (zFar - zNear), -zNear / (zFar - zNear) },
-                [4]T{ 0.0, 0.0, 0.0, 1.0 },
+                [4]T{ 2.0 / (right - left), 0.0, 0.0, 0.0 },
+                [4]T{ 0.0, 2.0 / (top - bottom), 0.0, 0.0 },
+                [4]T{ 0.0, 0.0, -1.0 / (zFar - zNear), 0.0 },
+                [4]T{ -(right + left) / (right - left), -(top + bottom) / (top - bottom), -zNear / (zFar - zNear), 1.0 },
             } };
         }
 
@@ -279,7 +279,6 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
 
         pub inline fn initTranslate(pos: anytype) Self {
             assertCompatible(@TypeOf(pos), .vector3);
-
             return .{
                 .fields = [4][4]T{
                     [4]T{ 1.0, 0.0, 0.0, 0.0 },
@@ -294,7 +293,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
             assertCompatible(@TypeOf(pos), .vector3);
             assertCompatible(@TypeOf(rot), .quaternion);
 
-            return multiply(initTranslate(pos), initFromRotation(rot));
+            return multiply(initFromRotation(rot), initTranslate(pos));
         }
 
         pub inline fn initModel(pos: anytype, sc: anytype, rot: anytype) Self {
