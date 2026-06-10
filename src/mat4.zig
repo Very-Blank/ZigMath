@@ -304,10 +304,10 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
 
             return multiply(
                 multiply(
+                    initTranslate(pos),
                     initFromRotation(rot),
-                    initScale(sc),
                 ),
-                initTranslate(pos),
+                initScale(sc),
             );
         }
     };
