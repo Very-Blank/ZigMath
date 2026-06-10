@@ -171,7 +171,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
             const scale: T = if (@abs(1.0 - magnitude) < 2.107342e-08) 2.0 / (1.0 + magnitude) else 1.0 / @sqrt(magnitude);
 
             return .{
-                .fields = .{ self.fields[0] / scale, self.fields[1] / scale, self.fields[2] / scale, self.fields[3] / scale },
+                .fields = .{ self.fields[0] * scale, self.fields[1] * scale, self.fields[2] * scale, self.fields[3] * scale },
             };
         }
     };
