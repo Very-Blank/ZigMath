@@ -64,6 +64,44 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
             return multiply(multiply(initFromRadians(.x, vector.x), initFromRadians(.y, vector.y)), initFromRadians(.z, vector.z));
         }
 
+        pub fn initFromMatrix(mat: anytype) Self {
+            assertCompatible(@TypeOf(mat), .mat4);
+            var quaternion: Self = undefined;
+
+            const trace: T = mat.fields[0][0] + mat.fields[1][1] + mat.fields[2][2];
+            var root: T = trace;
+
+            if (0 < trace) {
+                root = @sqrt(trace + 1.0);
+                quaternion.fields[0] = 0.5 * root;
+                root = 0.5 / root;
+                quaternion.fields[1] = root * (mat.fields[1][2] - mat.fields[2][1]);
+                quaternion.fields[2] = root * (mat.fields[2][0] - mat.fields[0][2]);
+                quaternion.fields[3] = root * (mat.fields[0][1] - mat.fields[1][0]);
+            } else {
+                const next: [3]usize = .{ 1, 2, 0 };
+                var i: usize = 0;
+                if (mat.fields[1][1] > mat.fields[0][0]) i = 1;
+                if (mat.fields[2][2] > mat.fields[i][i]) i = 2;
+                const j: usize = next[i];
+                const k: usize = next[j];
+
+                root = @sqrt(mat.fields[i][i] - mat.fields[j][j] - mat.fields[k][k] + 1.0);
+
+                var fields: [4]T = undefined;
+
+                fields[i + 1] = 0.5 * root;
+                root = 0.5 / root;
+                fields[j + 1] = root * (mat.fields[i][j] + mat.fields[j][i]);
+                fields[k + 1] = root * (mat.fields[i][k] + mat.fields[k][i]);
+                fields[0] = root * (mat.fields[j][k] - mat.fields[k][j]);
+
+                quaternion.fields = fields;
+            }
+
+            return quaternion;
+        }
+
         pub fn initCamRotation(yaw: T, pitch: T) Self {
             const yawn_w = @cos(yaw / 2);
             const yawn_y = @sin(yaw / 2);
