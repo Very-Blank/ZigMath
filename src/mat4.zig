@@ -138,6 +138,18 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
             };
         }
 
+        pub fn transpose(self: Self) Self {
+            var result_fields: Self = undefined;
+
+            for (0..4) |r| {
+                for (0..4) |c| {
+                    result.fields[r][c] = self.fields[c][r];
+                }
+            }
+
+            return result;
+        }
+
         pub fn inverse(self: Self) Self {
             const det = self.determinant();
             std.debug.assert(det != 0);
