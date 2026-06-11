@@ -139,7 +139,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn transpose(self: Self) Self {
-            var result_fields: Self = undefined;
+            var result: Self = undefined;
 
             for (0..4) |r| {
                 for (0..4) |c| {
