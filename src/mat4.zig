@@ -1,5 +1,6 @@
 const std = @import("std");
 const Type = @import("type.zig").Type;
+const assertCompatible = @import("type.zig").assertCompatible;
 
 pub fn Mat4(comptime T: type, comptime Unique: type) type {
     switch (@typeInfo(T)) {
@@ -37,19 +38,6 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
                 [4]T{ 0.0, 0.0, 0.0, 1.0 },
             },
         };
-
-        fn assertCompatible(comptime other: type, comptime expected: Type) void {
-            switch (@typeInfo(other)) {
-                .@"struct" => {},
-                else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
-            }
-
-            if (!@hasDecl(other, "InnerType") or InnerType != other.InnerType)
-                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-
-            if (!@hasDecl(other, "type") or @TypeOf(other.type) != Type or other.type != expected)
-                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-        }
 
         pub fn multiply(mat1: Self, mat2: anytype) Self {
             assertCompatible(@TypeOf(mat2), .mat4);

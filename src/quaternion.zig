@@ -1,5 +1,6 @@
 const AxisType = @import("axis.zig").AxisType;
 const Type = @import("type.zig").Type;
+const assertCompatible = @import("type.zig").assertCompatible;
 
 pub fn Quaternion(comptime T: type, Unique: type) type {
     switch (@typeInfo(T)) {
@@ -23,19 +24,6 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
         pub const @"type": Type = .quaternion;
 
         pub const identity: Self = .{ .fields = @Vector(4, T){ 1, 0, 0, 0 } };
-
-        fn assertCompatible(comptime other: type, comptime expected: Type) void {
-            switch (@typeInfo(other)) {
-                .@"struct" => {},
-                else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
-            }
-
-            if (!@hasDecl(other, "InnerType") or InnerType != other.InnerType)
-                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-
-            if (!@hasDecl(other, "type") or @TypeOf(other.type) != Type or other.type != expected)
-                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-        }
 
         pub fn initFromRadians(comptime axis: AxisType, radians: T) Self {
             switch (axis) {

@@ -3,7 +3,9 @@ const std = @import("std");
 const Quaternion = @import("quaternion.zig").Quaternion;
 const Vector2 = @import("vector2.zig").Vector2;
 const AxisType = @import("axis.zig").AxisType;
+
 const Type = @import("type.zig").Type;
+const assertCompatible = @import("type.zig").assertCompatible;
 
 pub fn Vector3(comptime T: type, comptime Unique: type) type {
     switch (@typeInfo(T)) {
@@ -33,19 +35,6 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         pub const up: Self = .{ .x = 0.0, .y = 1.0, .z = 0.0 };
         pub const right: Self = .{ .x = 1.0, .y = 0.0, .z = 0.0 };
         pub const forward: Self = .{ .x = 0.0, .y = 0.0, .z = 1.0 };
-
-        fn assertCompatible(comptime other: type, comptime expected: Type) void {
-            switch (@typeInfo(other)) {
-                .@"struct" => {},
-                else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
-            }
-
-            if (!@hasDecl(other, "InnerType") or InnerType != other.InnerType)
-                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-
-            if (!@hasDecl(other, "type") or @TypeOf(other.type) != Type or other.type != expected)
-                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-        }
 
         pub inline fn coerce(self: Self, comptime to: type) to {
             assertCompatible(to, .vector3);

@@ -1,5 +1,6 @@
 const std = @import("std");
 const Type = @import("type.zig").Type;
+const assertCompatible = @import("type.zig").assertCompatible;
 
 pub fn Vector2(comptime T: type, comptime Unique: type) type {
     switch (@typeInfo(T)) {
@@ -27,19 +28,6 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         pub const right: Self = .{ .x = 1.0, .y = 0.0 };
         pub const one: Self = .{ .x = 1.0, .y = 1.0 };
         pub const zero: Self = .{ .x = 0.0, .y = 0.0 };
-
-        fn assertCompatible(comptime other: type, comptime expected: Type) void {
-            switch (@typeInfo(other)) {
-                .@"struct" => {},
-                else => @compileError("Unexpected type was given: " ++ @typeName(other) ++ "."),
-            }
-
-            if (!@hasDecl(other, "InnerType") or InnerType != other.InnerType)
-                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-
-            if (!@hasDecl(other, "type") or @TypeOf(other.type) != Type or other.type != expected)
-                @compileError("Unexpected type was given: " ++ @typeName(other) ++ ".");
-        }
 
         pub inline fn add(vec1: Self, vec2: anytype) Self {
             assertCompatible(@TypeOf(vec2), .vector2);
