@@ -37,7 +37,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         pub const forward: Self = .{ .x = 0.0, .y = 0.0, .z = 1.0 };
 
         pub inline fn coerce(self: Self, comptime to: type) to {
-            assertCompatible(to, .vector3);
+            assertCompatible(InnerType, to, .vector3);
             return .{
                 .x = self.x,
                 .y = self.y,
@@ -46,7 +46,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn add(vec1: Self, vec2: anytype) Self {
-            assertCompatible(@TypeOf(vec2), .vector3);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector3);
 
             return .{
                 .x = vec1.x + vec2.x,
@@ -56,7 +56,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn subtract(vec1: Self, vec2: anytype) Self {
-            assertCompatible(@TypeOf(vec2), .vector3);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector3);
 
             return .{
                 .x = vec1.x - vec2.x,
@@ -66,7 +66,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn multiply(vec1: Self, vec2: anytype) Self {
-            assertCompatible(@TypeOf(vec2), .vector3);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector3);
 
             return .{
                 .x = vec1.x * vec2.x,
@@ -76,7 +76,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn divide(vec1: Self, vec2: anytype) Self {
-            assertCompatible(@TypeOf(vec2), .vector3);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector3);
 
             std.debug.assert(vec2.x != 0.0);
             std.debug.assert(vec2.y != 0.0);
@@ -116,13 +116,13 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn dot(vec1: Self, vec2: anytype) T {
-            assertCompatible(@TypeOf(vec2), .vector3);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector3);
 
             return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
         }
 
         pub inline fn cross(vec1: Self, vec2: anytype) Self {
-            assertCompatible(@TypeOf(vec2), .vector3);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector3);
 
             return .{
                 .x = vec1.y * vec2.z - vec1.z * vec2.y,
@@ -155,7 +155,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn rotate(vec1: Self, rotation: anytype) Self {
-            assertCompatible(@TypeOf(rotation), .quaternion);
+            assertCompatible(InnerType, @TypeOf(rotation), .quaternion);
 
             const qVec = Self{
                 .x = rotation.fields[1],
@@ -192,7 +192,7 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn distance(vec1: Self, vec2: anytype) T {
-            assertCompatible(@TypeOf(vec2), .vector3);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector3);
             return @sqrt((vec2.x - vec1.x) * (vec2.x - vec1.x) + (vec2.y - vec1.y) * (vec2.y - vec1.y) + (vec2.z - vec1.z) * (vec2.z - vec1.z));
         }
 
@@ -201,20 +201,20 @@ pub fn Vector3(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn pointsDistanceToLine(a: Self, b: anytype, p: anytype) f32 {
-            assertCompatible(@TypeOf(b), .vector3);
-            assertCompatible(@TypeOf(p), .vector3);
+            assertCompatible(InnerType, @TypeOf(b), .vector3);
+            assertCompatible(InnerType, @TypeOf(p), .vector3);
 
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
 
             const dot_product = @max(0.0, @min(1.0, p.subtract(a).dot(b.subtract(a)) / length_squared));
-            const projection = a.add(b.subtract(a)).scale(dot_product);
+            const projection = a.add(b.subtract(a).scale(dot_product));
             return p.distance(projection);
         }
 
         pub fn closestPointOnLine(a: Self, b: anytype, p: anytype) Self {
-            assertCompatible(@TypeOf(b), .vector3);
-            assertCompatible(@TypeOf(p), .vector3);
+            assertCompatible(InnerType, @TypeOf(b), .vector3);
+            assertCompatible(InnerType, @TypeOf(p), .vector3);
 
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);

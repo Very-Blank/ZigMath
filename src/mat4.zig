@@ -40,7 +40,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         };
 
         pub fn multiply(mat1: Self, mat2: anytype) Self {
-            assertCompatible(@TypeOf(mat2), .mat4);
+            assertCompatible(InnerType, @TypeOf(mat2), .mat4);
 
             var result: [4][4]T = [4][4]T{
                 [4]T{ 0.0, 0.0, 0.0, 0.0 },
@@ -94,7 +94,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn initFromRotation(rot: anytype) Self {
-            assertCompatible(@TypeOf(rot), .quaternion);
+            assertCompatible(InnerType, @TypeOf(rot), .quaternion);
 
             return .{
                 .fields = [4][4]T{
@@ -265,7 +265,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initScale(sc: anytype) Self {
-            assertCompatible(@TypeOf(sc), .vector3);
+            assertCompatible(InnerType, @TypeOf(sc), .vector3);
 
             return .{
                 .fields = [4][4]T{
@@ -278,7 +278,7 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initTranslate(pos: anytype) Self {
-            assertCompatible(@TypeOf(pos), .vector3);
+            assertCompatible(InnerType, @TypeOf(pos), .vector3);
             return .{
                 .fields = [4][4]T{
                     [4]T{ 1.0, 0.0, 0.0, 0.0 },
@@ -290,16 +290,16 @@ pub fn Mat4(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn initView(pos: anytype, rot: anytype) Self {
-            assertCompatible(@TypeOf(pos), .vector3);
-            assertCompatible(@TypeOf(rot), .quaternion);
+            assertCompatible(InnerType, @TypeOf(pos), .vector3);
+            assertCompatible(InnerType, @TypeOf(rot), .quaternion);
 
             return multiply(initFromRotation(rot), initTranslate(pos));
         }
 
         pub inline fn initModel(pos: anytype, sc: anytype, rot: anytype) Self {
-            assertCompatible(@TypeOf(pos), .vector3);
-            assertCompatible(@TypeOf(sc), .vector3);
-            assertCompatible(@TypeOf(rot), .quaternion);
+            assertCompatible(InnerType, @TypeOf(pos), .vector3);
+            assertCompatible(InnerType, @TypeOf(sc), .vector3);
+            assertCompatible(InnerType, @TypeOf(rot), .quaternion);
 
             return multiply(
                 multiply(

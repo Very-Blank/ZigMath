@@ -47,14 +47,14 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
 
         // Uses x, y, z order
         pub fn initFromVector(vector: anytype) Self {
-            assertCompatible(@TypeOf(vector), .vector3);
+            assertCompatible(InnerType, @TypeOf(vector), .vector3);
 
             return multiply(multiply(initFromRadians(.x, vector.x), initFromRadians(.y, vector.y)), initFromRadians(.z, vector.z));
         }
 
         // From: https://github.com/g-truc/glm
         pub fn initFromMatrix(mat: anytype) Self {
-            assertCompatible(@TypeOf(mat), .mat4);
+            assertCompatible(InnerType, @TypeOf(mat), .mat4);
             var quaternion: Self = undefined;
 
             const trace: T = mat.fields[0][0] + mat.fields[1][1] + mat.fields[2][2];
@@ -142,7 +142,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
 
         // Hamilton product
         pub fn multiply(quat1: Self, quat2: anytype) Self {
-            assertCompatible(@TypeOf(quat2), .quaternion);
+            assertCompatible(InnerType, @TypeOf(quat2), .quaternion);
 
             return .{
                 .fields = @Vector(4, T){

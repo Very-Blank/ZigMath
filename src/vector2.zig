@@ -30,7 +30,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         pub const zero: Self = .{ .x = 0.0, .y = 0.0 };
 
         pub inline fn add(vec1: Self, vec2: anytype) Self {
-            assertCompatible(@TypeOf(vec2), .vector2);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector2);
 
             return .{
                 .x = vec1.x + vec2.x,
@@ -39,7 +39,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn subtract(vec1: Self, vec2: anytype) Self {
-            assertCompatible(@TypeOf(vec2), .vector2);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector2);
 
             return .{
                 .x = vec1.x - vec2.x,
@@ -48,7 +48,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn multiply(vec1: Self, vec2: anytype) Self {
-            assertCompatible(@TypeOf(vec2), .vector2);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector2);
 
             return .{
                 .x = vec1.x * vec2.x,
@@ -57,7 +57,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn divide(vec1: Self, vec2: anytype) Self {
-            assertCompatible(@TypeOf(vec2), .vector2);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector2);
 
             std.debug.assert(vec2.x != 0.0);
             std.debug.assert(vec2.y != 0.0);
@@ -92,7 +92,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn dot(vec1: Self, vec2: anytype) T {
-            assertCompatible(@TypeOf(vec2), .vector2);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector2);
 
             return vec1.x * vec2.x + vec1.y * vec2.y;
         }
@@ -106,7 +106,7 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub inline fn distance(vec1: Self, vec2: anytype) T {
-            assertCompatible(@TypeOf(vec2), .vector2);
+            assertCompatible(InnerType, @TypeOf(vec2), .vector2);
 
             return @sqrt((vec2.x - vec1.x) * (vec2.x - vec1.x) + (vec2.y - vec1.y) * (vec2.y - vec1.y));
         }
@@ -116,26 +116,26 @@ pub fn Vector2(comptime T: type, comptime Unique: type) type {
         }
 
         pub fn pointsDistanceToLine(a: Self, b: anytype, p: anytype) f32 {
-            assertCompatible(@TypeOf(b), .vector2);
-            assertCompatible(@TypeOf(p), .vector2);
+            assertCompatible(InnerType, @TypeOf(b), .vector2);
+            assertCompatible(InnerType, @TypeOf(p), .vector2);
 
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
 
             const dot_product = @max(0.0, @min(1.0, dot(p.subtract(a), b.subtract(a)) / length_squared));
-            const projection = a.add(b.subtract(a)).scale(dot_product);
+            const projection = a.add(b.subtract(a).scale(dot_product));
             return p.distance(projection);
         }
 
         pub fn closestPointOnLine(a: Self, b: anytype, p: anytype) Self {
-            assertCompatible(@TypeOf(b), .vector2);
-            assertCompatible(@TypeOf(p), .vector2);
+            assertCompatible(InnerType, @TypeOf(b), .vector2);
+            assertCompatible(InnerType, @TypeOf(p), .vector2);
 
             const length_squared = magnitude(b.subtract(a));
             std.debug.assert(length_squared != 0.0);
 
             const dot_product = @max(0.0, @min(1.0, dot(p.subtract(a), b.subtract(a)) / length_squared));
-            return a.add(b.subtract(a)).scale(dot_product);
+            return a.add(b.subtract(a).scale(dot_product));
         }
     };
 }
