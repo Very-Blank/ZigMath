@@ -157,6 +157,17 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
             };
         }
 
+        pub fn invert(self: Self) Self {
+            return .{
+                .fields = .{
+                    self.fields[0],
+                    -self.fields[1],
+                    -self.fields[2],
+                    -self.fields[3],
+                },
+            };
+        }
+
         // Hamilton product
         pub fn multiply(quat1: Self, quat2: anytype) Self {
             assertCompatible(InnerType, @TypeOf(quat2), .quaternion);
