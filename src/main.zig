@@ -6,6 +6,7 @@ pub const AxisType = @import("axis.zig").AxisType;
 
 pub const Type = @import("type.zig").Type;
 pub const assertCompatible = @import("type.zig").assertCompatible;
+pub const assertType = @import("type.zig").assertType;
 
 pub const @"f32" = struct {
     pub const Vector2 = @import("vector2.zig").Vector2(f32, opaque {});
