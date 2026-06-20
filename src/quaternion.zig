@@ -1,3 +1,4 @@
+const std = @import("std");
 const AxisType = @import("axis.zig").AxisType;
 const Type = @import("type.zig").Type;
 const assertCompatible = @import("type.zig").assertCompatible;
@@ -108,7 +109,7 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
             };
         }
 
-        pub fn addRotationAroundAxis(self: Self, comptime axis: AxisType, radians: T) Self {
+        pub fn addAroundAxis(self: Self, comptime axis: AxisType, radians: T) Self {
             const rad_cos = @cos(radians / 2);
             const rad_sin = @sin(radians / 2);
 
@@ -137,6 +138,22 @@ pub fn Quaternion(comptime T: type, Unique: type) type {
                         rad_cos * self.fields[3] + rad_sin * self.fields[0],
                     },
                 },
+            };
+        }
+
+        pub fn extractAxis(self: Self, comptime axis: AxisType) T {
+            return switch (axis) {
+                .x => std.math.atan2(
+                    2.0 * (self.fields[2] * self.fields[3] + self.fields[0] * self.fields[1]),
+                    self.fields[0] * self.fields[0] - self.fields[1] * self.fields[1] - self.fields[2] * self.fields[2] + self.fields[3] * self.fields[3],
+                ),
+                .y => std.math.asin(
+                    -2.0 * (self.fields[1] * self.fields[3] - self.fields[0] * self.fields[2]),
+                ),
+                .z => std.math.atan2(
+                    2.0 * (self.fields[1] * self.fields[2] + self.fields[0] * self.fields[3]),
+                    self.fields[0] * self.fields[0] + self.fields[1] * self.fields[1] - self.fields[2] * self.fields[2] - self.fields[3] * self.fields[3],
+                ),
             };
         }
 
